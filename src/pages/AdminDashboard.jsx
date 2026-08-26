@@ -15,6 +15,8 @@ export function AdminDashboard({
   setCars,
   leads,
   setLeads,
+  carFeatures,
+  setCarFeatures,
   tab,
   setTab,
   onLogout,
@@ -281,6 +283,7 @@ export function AdminDashboard({
             cars={cars}
             setCars={setCars}
             advertisers={advertisers}
+            carFeatures={carFeatures}
             showToast={showToast}
           />
         )}
@@ -366,7 +369,13 @@ export function AdminDashboard({
         )}
 
         {/* TAB 8: SETTINGS (ตั้งค่า) */}
-        {tab === 'settings' && <AdminSettings showToast={showToast} />}
+        {tab === 'settings' && (
+          <AdminSettings
+            carFeatures={carFeatures}
+            setCarFeatures={setCarFeatures}
+            showToast={showToast}
+          />
+        )}
       </div>
     </AppShell>
   );

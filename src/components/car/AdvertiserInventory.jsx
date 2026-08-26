@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { formatNumber, generateId } from '../../utils/formatters';
 import CarEditorForm from './CarEditorForm';
 
-export function AdvertiserInventory({ advertiser, cars, setCars, showToast }) {
+export function AdvertiserInventory({ advertiser, cars, setCars, carFeatures, showToast }) {
   const [editingCar, setEditingCar] = useState(null);
 
   const myCars = cars.filter((c) => c.advertiserId === advertiser.id);
@@ -61,6 +61,7 @@ export function AdvertiserInventory({ advertiser, cars, setCars, showToast }) {
         <CarEditorForm
           car={editingCar}
           storeName={advertiser.storeName}
+          carFeatures={carFeatures}
           onSave={handleSaveCar}
           onCancel={() => setEditingCar(null)}
           showToast={showToast}

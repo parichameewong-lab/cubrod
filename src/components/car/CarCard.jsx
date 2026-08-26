@@ -38,16 +38,31 @@ export function CarCard({ car, onSelect }) {
         <h3>{car.title}</h3>
         <p>{car.description}</p>
 
-        {car.monthlyPayment && (
-          <div className="installment-chip">
-            <span>ผ่อนเริ่มต้น</span>
-            <b>฿{formatNumber(car.monthlyPayment)}/เดือน</b>
+        {Array.isArray(car.features) && car.features.length > 0 && (
+          <div className="market-card-feature-chips">
+            {car.features.slice(0, 3).map((feat, idx) => (
+              <span key={idx} className="card-mini-feat">
+                ✓ {feat}
+              </span>
+            ))}
+            {car.features.length > 3 && (
+              <span className="card-mini-feat more">+{car.features.length - 3}</span>
+            )}
           </div>
         )}
 
-        <div className="market-price">
-          <strong>฿{formatNumber(car.price)}</strong>
-          <small>ราคาเสนอขาย</small>
+        <div className="market-card-bottom-row">
+          <div className="market-price">
+            <strong>฿{formatNumber(car.price)}</strong>
+            <small>ราคาเสนอขาย</small>
+          </div>
+
+          {car.monthlyPayment && (
+            <div className="installment-chip">
+              <span>ผ่อนเริ่มต้น</span>
+              <b>฿{formatNumber(car.monthlyPayment)}/เดือน</b>
+            </div>
+          )}
         </div>
       </div>
     </article>

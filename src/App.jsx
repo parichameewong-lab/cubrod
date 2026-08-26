@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { getStorage, setStorage, KEYS } from './services/storage';
 import { initialAgents, initialAdvertisers, initialCars, initialLeads } from './data/initialData';
+import { DEFAULT_CAR_FEATURES } from './data/carFeatures';
 import Home from './pages/Home';
 import AgentDashboard from './pages/AgentDashboard';
 import AgentStorefront from './pages/AgentStorefront';
@@ -19,6 +20,7 @@ export function App() {
   const [advertisers, setAdvertisers] = useState(initialAdvertisers);
   const [cars, setCars] = useState(initialCars);
   const [leads, setLeads] = useState(initialLeads);
+  const [carFeatures, setCarFeatures] = useState(DEFAULT_CAR_FEATURES);
 
   const [currentAgent, setCurrentAgent] = useState(null);
   const [currentAdvertiser, setCurrentAdvertiser] = useState(null);
@@ -40,11 +42,13 @@ export function App() {
       const storedAdvertisers = getStorage(KEYS.ADVERTISERS, initialAdvertisers);
       const storedCars = getStorage(KEYS.CARS, initialCars);
       const storedLeads = getStorage(KEYS.LEADS, initialLeads);
+      const storedFeatures = getStorage(KEYS.CAR_FEATURES, DEFAULT_CAR_FEATURES);
 
       setAgents(storedAgents);
       setAdvertisers(storedAdvertisers);
       setCars(storedCars);
       setLeads(storedLeads);
+      setCarFeatures(storedFeatures);
 
       const params = new URLSearchParams(window.location.search);
       const carId = params.get('car');
@@ -252,6 +256,8 @@ export function App() {
           setCars={setCars}
           leads={leads}
           setLeads={setLeads}
+          carFeatures={carFeatures}
+          setCarFeatures={setCarFeatures}
           tab={adminTab}
           setTab={setAdminTab}
           onLogout={handleBackToHome}
@@ -268,6 +274,7 @@ export function App() {
           }}
           cars={cars}
           setCars={setCars}
+          carFeatures={carFeatures}
           tab={advertiserTab}
           setTab={setAdvertiserTab}
           onLogout={handleBackToHome}
@@ -280,6 +287,7 @@ export function App() {
           car={selectedCar}
           agents={agents}
           attribution={attribution}
+          carFeatures={carFeatures}
           onBack={handleBackToHome}
           onLead={(newLead) => {
             setLeads((prev) => [newLead, ...prev]);

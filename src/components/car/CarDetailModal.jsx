@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { formatNumber, getCarImages, generateId } from '../../utils/formatters';
 import { createConversation } from '../../services/api';
+import { getFeatureIcon } from '../../data/carFeatures';
 import CarLoanCalculator from './CarLoanCalculator';
 
 export function CarDetailModal({ car, agents, attribution, onBack, onLead }) {
@@ -293,6 +294,40 @@ export function CarDetailModal({ car, agents, attribution, onBack, onLead }) {
               <p className="desc-text">
                 {car.description || 'อีโคคาร์ประหยัดน้ำมัน ห้องโดยสารกว้าง คล่องตัว เหมาะกับการใช้งานในเมือง'}
               </p>
+            </div>
+
+            {/* Car Features & Options Card (Clean & Mobile-Friendly) */}
+            <div className="car-features-card">
+              <div className="car-features-header">
+                <div className="features-title-group">
+                  <span className="desc-sublabel">คุณสมบัติและออฟชั่นเด่น</span>
+                  <h3 className="features-card-title">คุณสมบัติ / ออฟชั่นของคันนี้</h3>
+                </div>
+                {Array.isArray(car.features) && car.features.length > 0 && (
+                  <span className="features-total-chip">
+                    {car.features.length} รายการ
+                  </span>
+                )}
+              </div>
+
+              {Array.isArray(car.features) && car.features.length > 0 ? (
+                <div className="car-features-grid">
+                  {car.features.map((feat, idx) => (
+                    <div key={idx} className="car-feature-pill">
+                      <span className="feature-pill-icon">{getFeatureIcon(feat)}</span>
+                      <span className="feature-pill-name">{feat}</span>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="car-features-empty">
+                  <span className="empty-icon">🚗</span>
+                  <div>
+                    <strong>อุปกรณ์มาตรฐานครบครันตามรุ่น</strong>
+                    <small>พร้อมการตรวจสภาพอย่างละเอียดโดยผู้เชี่ยวชาญ</small>
+                  </div>
+                </div>
+              )}
             </div>
 
             <div className="trust-chips-row">

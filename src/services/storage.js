@@ -28,4 +28,5 @@ export const KEYS = {
   CARS: 'cc-cars',
   LEADS: 'cc-leads',
   FIRST_TOUCH: 'cc-first-touch',
+  CAR_FEATURES: 'cc-car-features',
 };

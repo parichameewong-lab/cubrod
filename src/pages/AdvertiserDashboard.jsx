@@ -9,6 +9,7 @@ export function AdvertiserDashboard({
   onUpdate,
   cars,
   setCars,
+  carFeatures,
   tab,
   setTab,
   onLogout,
@@ -132,6 +133,7 @@ export function AdvertiserDashboard({
             advertiser={advertiser}
             cars={cars}
             setCars={setCars}
+            carFeatures={carFeatures}
             showToast={showToast}
           />
         )}

@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { formatNumber, generateId } from '../../utils/formatters';
 import CarEditorForm from './CarEditorForm';
 
-export function AdminCarManager({ cars, setCars, advertisers, showToast }) {
+export function AdminCarManager({ cars, setCars, advertisers, carFeatures, showToast }) {
   const [editingCar, setEditingCar] = useState(null);
 
   const toggleVisibility = (carId) => {
@@ -81,6 +81,7 @@ export function AdminCarManager({ cars, setCars, advertisers, showToast }) {
         <CarEditorForm
           car={editingCar}
           storeName="CLUBROD Admin Central"
+          carFeatures={carFeatures}
           onSave={handleSaveCar}
           onCancel={() => setEditingCar(null)}
           showToast={showToast}
