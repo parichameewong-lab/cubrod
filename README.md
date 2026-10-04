@@ -1,4 +1,4 @@
-# CLUBROD — Editable Source Project & Local Recovery
+# CUBROD — Editable Source Project & Local Recovery
 
 โปรเจกต์นี้ได้รับการกู้คืนและแปลงจาก Production Build ให้กลายเป็น **Editable React Source Project** ที่รองรับ Vite สำหรับพัฒนาต่อได้โดยตรงใน Antigravity / VS Code
 
