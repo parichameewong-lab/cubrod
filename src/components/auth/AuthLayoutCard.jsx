@@ -6,7 +6,7 @@ export function AuthLayoutCard({
   subtitle,
   onBack,
   children,
-  badgeText = 'CLUBROD COMMUNITY MARKETPLACE',
+  badgeText = 'CUBROD COMMUNITY MARKETPLACE',
   promoTitle = 'สร้างโอกาสใหม่ จากทุกการแนะนำ',
   promoSubtitle = 'เลือกรถ แชร์ลิงก์ และติดตามรายได้ของคุณได้ในที่เดียว',
   benefits = [

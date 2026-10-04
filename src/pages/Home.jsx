@@ -103,7 +103,7 @@ export function Home({ cars, onRegister, onAdvertiserRegister, onLogin, onMobile
         <div className="container market-hero-inner">
           <div className="market-copy">
             <div className="eyebrow light">
-              <span>●</span> CLUBROD SELECTED CARS
+              <span>●</span> CUBROD SELECTED CARS
             </div>
             <h1>
               รถมือสองคัดคุณภาพ
@@ -111,7 +111,7 @@ export function Home({ cars, onRegister, onAdvertiserRegister, onLogin, onMobile
               <span>เลือกง่าย มั่นใจกว่า</span>
             </h1>
             <p>
-              ค้นหารถที่เหมาะกับคุณ พร้อมทีม CLUBROD ช่วยตรวจสอบข้อมูล ประสานนัดดูรถ
+              ค้นหารถที่เหมาะกับคุณ พร้อมทีม CUBROD ช่วยตรวจสอบข้อมูล ประสานนัดดูรถ
               และดูแลทุกขั้นตอนก่อนตัดสินใจ
             </p>
 
@@ -322,7 +322,7 @@ export function Home({ cars, onRegister, onAdvertiserRegister, onLogin, onMobile
               aria-live="polite"
               onClick={() => onSelect(currentFeatured)}
             >
-              <span className="selection-chip">CLUBROD CHOICE</span>
+              <span className="selection-chip">CUBROD CHOICE</span>
               <div className="market-car-art" style={{ background: currentFeatured.tone }}>
                 <strong>{currentFeatured.brand?.toUpperCase()}</strong>
                 <i />
@@ -406,7 +406,7 @@ export function Home({ cars, onRegister, onAdvertiserRegister, onLogin, onMobile
       <section id="buying" className="buying-steps">
         <div className="container">
           <div className="section-heading">
-            <span>ซื้อรถกับ CLUBROD</span>
+            <span>ซื้อรถกับ CUBROD</span>
             <h2>ง่ายและมีทีมงานช่วยดูแล</h2>
           </div>
           <div className="steps">
@@ -423,7 +423,7 @@ export function Home({ cars, onRegister, onAdvertiserRegister, onLogin, onMobile
             <article>
               <IconBox>03</IconBox>
               <h3>นัดดูและตัดสินใจ</h3>
-              <p>ทีม CLUBROD ช่วยประสานนัดหมายและให้ข้อมูลก่อนซื้อ</p>
+              <p>ทีม CUBROD ช่วยประสานนัดหมายและให้ข้อมูลก่อนซื้อ</p>
             </article>
           </div>
         </div>

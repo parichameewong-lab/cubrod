@@ -25,7 +25,7 @@ export function Footer({ onRegister, onAdvertiserRegister, onLogin }) {
         </div>
       </div>
       <div className="footer-bottom container">
-        <span>© CLUBROD · ชุมชนคนรถมือสอง</span>
+        <span>© CUBROD · ชุมชนคนรถมือสอง</span>
         <span>ข้อมูลรถในระบบเป็นข้อมูลสำหรับการนำเสนอ</span>
       </div>
     </footer>

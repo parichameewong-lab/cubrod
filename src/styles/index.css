@@ -2391,7 +2391,8 @@
   transform: scale(1.05);
 }
 
-/* Subtle CLUBROD Watermark Overlay (Bottom-Right, Compact & Fainter) */
+/* Subtle CUBROD Watermark Overlay (Bottom-Right, Compact & Fainter) */
+.cubrod-watermark-overlay,
 .clubrod-watermark-overlay {
   position: absolute;
   inset: 0;

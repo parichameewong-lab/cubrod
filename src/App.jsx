@@ -2,6 +2,18 @@ import React, { useState, useEffect } from 'react';
 import { getStorage, setStorage, KEYS } from './services/storage';
 import { initialAgents, initialAdvertisers, initialCars, initialLeads } from './data/initialData';
 import { DEFAULT_CAR_FEATURES } from './data/carFeatures';
+import {
+  dbFetchCars,
+  dbFetchAgents,
+  dbFetchAdvertisers,
+  dbFetchLeads,
+  dbFetchCarFeatures,
+  dbUpsertCar,
+  dbUpsertAgent,
+  dbUpsertAdvertiser,
+  dbInsertLead,
+  dbUpdateLead,
+} from './services/db';
 import Home from './pages/Home';
 import AgentDashboard from './pages/AgentDashboard';
 import AgentStorefront from './pages/AgentStorefront';
@@ -34,71 +46,84 @@ export function App() {
   const [includeAdmin, setIncludeAdmin] = useState(true);
   const [toastMsg, setToastMsg] = useState('');
   const [attribution, setAttribution] = useState('PLATFORM');
+  const [loadingDb, setLoadingDb] = useState(true);
 
-  // Initial localStorage load and URL parameter check
+  // Initial load from Supabase / localStorage and URL parameter check
   useEffect(() => {
-    const timer = setTimeout(() => {
-      const storedAgents = getStorage(KEYS.AGENTS, initialAgents);
-      const storedAdvertisers = getStorage(KEYS.ADVERTISERS, initialAdvertisers);
-      const storedCars = getStorage(KEYS.CARS, initialCars);
-      const storedLeads = getStorage(KEYS.LEADS, initialLeads);
-      const storedFeatures = getStorage(KEYS.CAR_FEATURES, DEFAULT_CAR_FEATURES);
+    async function loadData() {
+      try {
+        const [loadedAgents, loadedAdvertisers, loadedCars, loadedLeads, loadedFeatures] = await Promise.all([
+          dbFetchAgents(),
+          dbFetchAdvertisers(),
+          dbFetchCars(),
+          dbFetchLeads(),
+          dbFetchCarFeatures(),
+        ]);
 
-      setAgents(storedAgents);
-      setAdvertisers(storedAdvertisers);
-      setCars(storedCars);
-      setLeads(storedLeads);
-      setCarFeatures(storedFeatures);
+        if (loadedAgents?.length) setAgents(loadedAgents);
+        if (loadedAdvertisers?.length) setAdvertisers(loadedAdvertisers);
+        if (loadedCars?.length) setCars(loadedCars);
+        if (loadedLeads?.length) setLeads(loadedLeads);
+        if (loadedFeatures?.length) setCarFeatures(loadedFeatures);
 
-      const params = new URLSearchParams(window.location.search);
-      const carId = params.get('car');
-      const refCode = params.get('ref');
-      const viewParam = params.get('view');
+        const params = new URLSearchParams(window.location.search);
+        const carId = params.get('car');
+        const refCode = params.get('ref');
+        const viewParam = params.get('view');
 
-      if (refCode) {
-        const foundAgent = storedAgents.find(
-          (a) => a.code === refCode || a.code.toLowerCase() === refCode.toLowerCase()
-        );
-        if (foundAgent) {
-          setActiveStorefrontAgent(foundAgent);
-        } else {
-          setActiveStorefrontAgent(storedAgents[0]);
-        }
+        const activeAgents = loadedAgents?.length ? loadedAgents : initialAgents;
+        const activeCarsList = loadedCars?.length ? loadedCars : initialCars;
 
-        try {
-          const firstTouch = JSON.parse(localStorage.getItem(KEYS.FIRST_TOUCH) || 'null');
-          const isFresh = firstTouch && Date.now() - firstTouch.createdAt < 30 * 24 * 60 * 60 * 1000;
-
-          if (!isFresh) {
-            localStorage.setItem(
-              KEYS.FIRST_TOUCH,
-              JSON.stringify({ agentCode: refCode, createdAt: Date.now() })
-            );
-            setAttribution(refCode);
+        if (refCode) {
+          const foundAgent = activeAgents.find(
+            (a) => a.code === refCode || a.code.toLowerCase() === refCode.toLowerCase()
+          );
+          if (foundAgent) {
+            setActiveStorefrontAgent(foundAgent);
           } else {
-            setAttribution(firstTouch.agentCode);
+            setActiveStorefrontAgent(activeAgents[0]);
           }
-        } catch {
-          setAttribution(refCode);
+
+          try {
+            const firstTouch = JSON.parse(localStorage.getItem(KEYS.FIRST_TOUCH) || 'null');
+            const isFresh = firstTouch && Date.now() - firstTouch.createdAt < 30 * 24 * 60 * 60 * 1000;
+
+            if (!isFresh) {
+              localStorage.setItem(
+                KEYS.FIRST_TOUCH,
+                JSON.stringify({ agentCode: refCode, createdAt: Date.now() })
+              );
+              setAttribution(refCode);
+            } else {
+              setAttribution(firstTouch.agentCode);
+            }
+          } catch {
+            setAttribution(refCode);
+          }
+
+          if (viewParam === 'storefront') {
+            setView('storefront');
+            setLoadingDb(false);
+            return;
+          }
         }
 
-        if (viewParam === 'storefront') {
-          setView('storefront');
-          return;
+        if (carId) {
+          const foundCar = activeCarsList.find((c) => c.id === carId);
+          if (foundCar) setSelectedCar(foundCar);
+          setView('customer');
         }
+      } catch (err) {
+        console.error('Failed to load data:', err);
+      } finally {
+        setLoadingDb(false);
       }
+    }
 
-      if (carId) {
-        const foundCar = storedCars.find((c) => c.id === carId);
-        if (foundCar) setSelectedCar(foundCar);
-        setView('customer');
-      }
-    }, 0);
-
-    return () => clearTimeout(timer);
+    loadData();
   }, []);
 
-  // Save changes to localStorage
+  // Save changes to localStorage for local caching
   useEffect(() => {
     setStorage(KEYS.AGENTS, agents);
   }, [agents]);
@@ -156,6 +181,27 @@ export function App() {
     }
   };
 
+  // Handlers with database persistence
+  const handleAgentRegister = async (newAgent) => {
+    setAgents((prev) => [...prev, newAgent]);
+    await dbUpsertAgent(newAgent);
+    setView('login');
+    showToast('สมัครสำเร็จ กรุณารอแอดมินอนุมัติบัญชี');
+  };
+
+  const handleAdvertiserRegister = async (newAdvertiser) => {
+    setAdvertisers((prev) => [...prev, newAdvertiser]);
+    await dbUpsertAdvertiser(newAdvertiser);
+    setView('login');
+    showToast('ส่งใบสมัครเต็นท์แล้ว กรุณารอแอดมินอนุมัติ');
+  };
+
+  const handleLeadSubmit = async (newLead) => {
+    setLeads((prev) => [newLead, ...prev]);
+    await dbInsertLead(newLead);
+    showToast('ส่งข้อมูลแล้ว ทีม CUBROD จะติดต่อกลับ');
+  };
+
   return (
     <main>
       {view === 'home' && (
@@ -181,9 +227,7 @@ export function App() {
           cars={cars}
           onSelectCar={handleSelectCar}
           onBackHome={handleBackToHome}
-          onLeadSubmitted={(newLead) => {
-            setLeads((prev) => [newLead, ...prev]);
-          }}
+          onLeadSubmitted={handleLeadSubmit}
           showToast={showToast}
         />
       )}
@@ -192,11 +236,7 @@ export function App() {
         <AgentRegisterForm
           onBack={handleBackToHome}
           onNavigateToLogin={() => setView('login')}
-          onComplete={(newAgent) => {
-            setAgents((prev) => [...prev, newAgent]);
-            setView('login');
-            showToast('สมัครสำเร็จ กรุณารอแอดมินอนุมัติบัญชี');
-          }}
+          onComplete={handleAgentRegister}
         />
       )}
 
@@ -204,11 +244,7 @@ export function App() {
         <AdvertiserRegisterForm
           onBack={handleBackToHome}
           onNavigateToLogin={() => setView('login')}
-          onComplete={(newAdvertiser) => {
-            setAdvertisers((prev) => [...prev, newAdvertiser]);
-            setView('login');
-            showToast('ส่งใบสมัครเต็นท์แล้ว กรุณารอแอดมินอนุมัติ');
-          }}
+          onComplete={handleAdvertiserRegister}
         />
       )}
 
@@ -268,9 +304,10 @@ export function App() {
       {view === 'advertiser' && currentAdvertiser && (
         <AdvertiserDashboard
           advertiser={currentAdvertiser}
-          onUpdate={(updated) => {
+          onUpdate={async (updated) => {
             setAdvertisers((prev) => prev.map((a) => (a.id === updated.id ? updated : a)));
             setCurrentAdvertiser(updated);
+            await dbUpsertAdvertiser(updated);
           }}
           cars={cars}
           setCars={setCars}
@@ -289,10 +326,7 @@ export function App() {
           attribution={attribution}
           carFeatures={carFeatures}
           onBack={handleBackToHome}
-          onLead={(newLead) => {
-            setLeads((prev) => [newLead, ...prev]);
-            showToast('ส่งข้อมูลแล้ว ทีม CLUBROD จะติดต่อกลับ');
-          }}
+          onLead={handleLeadSubmit}
         />
       )}
 

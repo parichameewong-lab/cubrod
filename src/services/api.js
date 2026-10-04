@@ -1,5 +1,5 @@
 /**
- * API Abstraction Service for CLUBROD
+ * API Abstraction Service for CUBROD
  * Handles endpoints detected in the production bundle:
  * - /api/inspection-reports
  * - /api/chats

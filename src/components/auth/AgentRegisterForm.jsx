@@ -52,7 +52,7 @@ export function AgentRegisterForm({ onBack, onComplete, onNavigateToLogin }) {
     <AuthLayoutCard
       title="สมัครเป็นนายหน้า"
       subtitle="เริ่มต้นฟรี รอทีมงานอนุมัติสร้างลิงก์เพื่อเริ่มแนะนำรถ"
-      badgeText="CLUBROD AFFILIATE PARTNER"
+      badgeText="CUBROD AFFILIATE PARTNER"
       promoTitle="สร้างโอกาสใหม่ จากทุกการแนะนำ"
       promoSubtitle="เลือกรถ แชร์ลิงก์ และติดตามรายได้ของคุณได้ในที่เดียว"
       benefits={agentBenefits}

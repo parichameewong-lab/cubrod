@@ -55,7 +55,7 @@ export function AdvertiserRegisterForm({ onBack, onComplete, onNavigateToLogin }
     <AuthLayoutCard
       title="ลงทะเบียนเต็นท์รถ"
       subtitle="สำหรับเต็นท์รถและผู้ประกอบการที่ต้องการลงขายรถกับแพลตฟอร์ม"
-      badgeText="CLUBROD DEALER NETWORK"
+      badgeText="CUBROD DEALER NETWORK"
       promoTitle="ขยายช่องทางขายรถ ผ่านเครือข่ายนายหน้า"
       promoSubtitle="ลงขายกับเรา ให้ทีมนายหน้ามืออาชีพช่วยโปรโมตและส่งลูกค้าให้คุณ"
       benefits={dealerBenefits}

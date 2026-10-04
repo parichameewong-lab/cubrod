@@ -13,7 +13,7 @@ export function LoginForm({
   onNavigateToAdvertiserRegister,
 }) {
   const [role, setRole] = useState('agent');
-  const [email, setEmail] = useState('agent@clubrod.com');
+  const [email, setEmail] = useState('agent@cubrod.com');
   const [password, setPassword] = useState('agent1234');
   const [showPassword, setShowPassword] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
@@ -22,13 +22,13 @@ export function LoginForm({
     setRole(newRole);
     setErrorMsg('');
     if (newRole === 'agent') {
-      setEmail('agent@clubrod.com');
+      setEmail('agent@cubrod.com');
       setPassword('agent1234');
     } else if (newRole === 'advertiser') {
-      setEmail('dealer@clubrod.com');
+      setEmail('dealer@cubrod.com');
       setPassword('dealer1234');
     } else if (newRole === 'admin') {
-      setEmail('admin@clubrod.com');
+      setEmail('admin@cubrod.com');
       setPassword('admin1234');
     }
   };
@@ -38,7 +38,7 @@ export function LoginForm({
     setErrorMsg('');
 
     if (role === 'admin') {
-      if (email.trim() === 'admin@clubrod.com' && password.trim() === 'admin1234') {
+      if ((email.trim() === 'admin@cubrod.com' || email.trim() === 'admin@clubrod.com') && password.trim() === 'admin1234') {
         return onAdmin();
       }
       return setErrorMsg('อีเมลหรือรหัสผ่านผู้ดูแลระบบไม่ถูกต้อง');

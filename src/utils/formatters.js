@@ -1,5 +1,5 @@
 /**
- * Helper & Formatter utilities extracted from CLUBROD bundle
+ * Helper & Formatter utilities extracted from CUBROD bundle
  */
 
 export const formatNumber = (num) => {

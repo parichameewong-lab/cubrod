@@ -143,7 +143,7 @@ export function AgentDashboard({
                 <div className="panel-title">
                   <div>
                     <h2>ลูกค้าล่าสุด</h2>
-                    <p>ทีม CLUBROD เป็นผู้ติดต่อลูกค้า</p>
+                    <p>ทีม CUBROD เป็นผู้ติดต่อลูกค้า</p>
                   </div>
                   <button type="button" onClick={() => setTab('leads')}>
                     ดูทั้งหมด →

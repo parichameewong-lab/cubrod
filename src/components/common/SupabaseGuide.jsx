@@ -14,7 +14,7 @@ export function SupabaseGuide({ showToast }) {
       id: 'supabase-project',
       number: '01',
       title: 'สมัครและสร้างโปรเจกต์',
-      copy: 'เข้า Supabase กด New project ตั้งชื่อ clubrod-production เลือก Region ใกล้ประเทศไทย และตั้ง Database password ที่คาดเดายาก',
+      copy: 'เข้า Supabase กด New project ตั้งชื่อ cubrod-production เลือก Region ใกล้ประเทศไทย และตั้ง Database password ที่คาดเดายาก',
       linkText: 'เปิด Supabase Dashboard',
       linkUrl: 'https://supabase.com/dashboard',
     },

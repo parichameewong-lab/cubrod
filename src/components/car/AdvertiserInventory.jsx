@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { formatNumber, generateId } from '../../utils/formatters';
 import CarEditorForm from './CarEditorForm';
+import { dbUpsertCar } from '../../services/db';
 
 export function AdvertiserInventory({ advertiser, cars, setCars, carFeatures, showToast }) {
   const [editingCar, setEditingCar] = useState(null);
@@ -30,7 +31,7 @@ export function AdvertiserInventory({ advertiser, cars, setCars, carFeatures, sh
     });
   };
 
-  const handleSaveCar = (updatedCar) => {
+  const handleSaveCar = async (updatedCar) => {
     setCars((prev) => {
       const exists = prev.some((c) => c.id === updatedCar.id);
       if (exists) {
@@ -39,6 +40,7 @@ export function AdvertiserInventory({ advertiser, cars, setCars, carFeatures, sh
       return [updatedCar, ...prev];
     });
 
+    await dbUpsertCar(updatedCar);
     showToast('บันทึกประกาศรถยนต์เรียบร้อยแล้ว');
     setEditingCar(null);
   };

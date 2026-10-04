@@ -195,7 +195,7 @@ export function CarDetailModal({ car, agents, attribution, onBack, onLead }) {
             {/* CAROUSEL SLIDER GALLERY */}
             <div className="detail-gallery-slider">
               <div className="slider-main-photo" style={{ background: car.tone }}>
-                <div className="hero-selected-badge">CLUBROD SELECTED CAR</div>
+                <div className="hero-selected-badge">CUBROD SELECTED CAR</div>
                 
                 {/* Image Counter & Zoom Indicator */}
                 <div className="slider-top-controls">
@@ -212,9 +212,9 @@ export function CarDetailModal({ car, agents, attribution, onBack, onLead }) {
                   </button>
                 </div>
 
-                {/* Subtle CLUBROD Watermark Overlay */}
-                <div className="clubrod-watermark-overlay">
-                  <span className="watermark-text">CLUBROD</span>
+                {/* Subtle CUBROD Watermark Overlay */}
+                <div className="cubrod-watermark-overlay clubrod-watermark-overlay">
+                  <span className="watermark-text">CUBROD</span>
                 </div>
 
                 {/* Main Slide Image */}
@@ -263,7 +263,7 @@ export function CarDetailModal({ car, agents, attribution, onBack, onLead }) {
                       onClick={() => setActiveImgIndex(idx)}
                     >
                       <img src={imgUrl} alt={`รูปเล็ก ${idx + 1}`} />
-                      <div className="thumbnail-watermark">CLUBROD</div>
+                      <div className="thumbnail-watermark">CUBROD</div>
                     </button>
                   ))}
                 </div>
@@ -273,7 +273,7 @@ export function CarDetailModal({ car, agents, attribution, onBack, onLead }) {
             {/* Car Header Card */}
             <div className="car-header-card">
               <div className="car-header-left">
-                <span className="brand-sublabel">รถคัดสภาพจาก CLUBROD</span>
+                <span className="brand-sublabel">รถคัดสภาพจาก CUBROD</span>
                 <h1 className="car-main-title">{car.title}</h1>
                 <p className="car-specs-subtitle">
                   {car.year} · เกียร์{car.transmission || 'อัตโนมัติ'} · รถพร้อมใช้งาน
@@ -388,7 +388,7 @@ export function CarDetailModal({ car, agents, attribution, onBack, onLead }) {
                       <div className="coupon-success-box">
                         <div className="success-icon">✓</div>
                         <h4>ลงทะเบียนรับคูปองเรียบร้อยแล้ว</h4>
-                        <p>ทีมงาน CLUBROD จะติดต่อกลับที่เบอร์ {couponPhone} เพื่อยืนยันสิทธิ์และรายละเอียด</p>
+                        <p>ทีมงาน CUBROD จะติดต่อกลับที่เบอร์ {couponPhone} เพื่อยืนยันสิทธิ์และรายละเอียด</p>
                         <button
                           type="button"
                           className="coupon-reset-btn"
@@ -485,7 +485,7 @@ export function CarDetailModal({ car, agents, attribution, onBack, onLead }) {
                 <div className="chat-tab-content">
                   <span className="lead-eyebrow">⚡ สอบถามรถคันนี้</span>
                   <h2 className="lead-title">
-                    แชทกับทีม <strong>CLUBROD</strong>
+                    แชทกับทีม <strong>CUBROD</strong>
                   </h2>
                   <p className="lead-sub">
                     ส่งคำถามถึงแอดมิน พร้อมแนบข้อมูลรถคันนี้ให้อัตโนมัติ
@@ -576,7 +576,7 @@ export function CarDetailModal({ car, agents, attribution, onBack, onLead }) {
                   <span className="lead-eyebrow">⚡ สนใจรถคันนี้?</span>
                   <h2 className="lead-title">ให้ทีมงานติดต่อกลับ</h2>
                   <p className="lead-sub">
-                    กรอกข้อมูลสั้น ๆ ทีม CLUBROD จะช่วยประสานและตอบคำถามให้คุณ
+                    กรอกข้อมูลสั้น ๆ ทีม CUBROD จะช่วยประสานและตอบคำถามให้คุณ
                   </p>
 
                   <form onSubmit={handleLeadSubmit} className="customer-form">
@@ -657,7 +657,7 @@ export function CarDetailModal({ car, agents, attribution, onBack, onLead }) {
                 </div>
               ) : (
                 <div className="lead-footer-attribution">
-                  <span className="shield-icon">🛡️</span> คุ้มครองสิทธิ์และบริการโดย <strong>CLUBROD Official</strong>
+                  <span className="shield-icon">🛡️</span> คุ้มครองสิทธิ์และบริการโดย <strong>CUBROD Official</strong>
                 </div>
               )}
             </div>
@@ -680,7 +680,7 @@ export function CarDetailModal({ car, agents, attribution, onBack, onLead }) {
                   <span className="icon-circle line">💬</span>
                   <div>
                     <small>สอบถามทาง LINE</small>
-                    <strong>@clubrod</strong>
+                    <strong>@cubrod</strong>
                   </div>
                 </a>
               </div>
@@ -723,7 +723,7 @@ export function CarDetailModal({ car, agents, attribution, onBack, onLead }) {
             {/* Main Zoom Stage */}
             <div className="lightbox-image-stage">
               <div className="lightbox-watermark-overlay">
-                <span>CLUBROD</span>
+                <span>CUBROD</span>
               </div>
               <img
                 src={currentImg}

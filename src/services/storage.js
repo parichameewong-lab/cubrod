@@ -1,5 +1,5 @@
 /**
- * Storage Service for CLUBROD Local Recovery
+ * Storage Service for CUBROD Local Recovery
  * Manages reading/writing from localStorage safely.
  */
 

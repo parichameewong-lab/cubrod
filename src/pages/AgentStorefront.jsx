@@ -41,10 +41,10 @@ export function AgentStorefront({
       <header className="storefront-nav">
         <div className="container storefront-nav-inner">
           <button type="button" className="back-link" onClick={onBackHome}>
-            ← กลับหน้าหลัก CLUBROD
+            ← กลับหน้าหลัก CUBROD
           </button>
           <div className="storefront-badge">
-            <span className="dot">●</span> หน้าร้านนายหน้าพันธมิตร CLUBROD
+            <span className="dot">●</span> หน้าร้านนายหน้าพันธมิตร CUBROD
           </div>
         </div>
       </header>
@@ -61,7 +61,7 @@ export function AgentStorefront({
                 <span className="role-tag">นายหน้าทางการ (Official Agent)</span>
                 <span className="verified-badge">✓ ยืนยันตัวตนแล้ว</span>
               </div>
-              <h1>{agent?.name || 'นายหน้า CLUBROD'}</h1>
+              <h1>{agent?.name || 'นายหน้า CUBROD'}</h1>
               <p className="agent-code-text">
                 รหัสนายหน้า: <strong>{agent?.code || 'CC-AGENT'}</strong> | จังหวัด:{' '}
                 {agent?.province || 'เชียงใหม่'}

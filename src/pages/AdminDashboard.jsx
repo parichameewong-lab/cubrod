@@ -5,6 +5,7 @@ import AdminCarManager from '../components/car/AdminCarManager';
 import AdminPayoutManager from '../components/car/AdminPayoutManager';
 import ChatWidget from '../components/common/ChatWidget';
 import AdminSettings from '../components/admin/AdminSettings';
+import { dbUpsertAgent, dbUpsertAdvertiser, dbUpdateLead } from '../services/db';
 
 export function AdminDashboard({
   agents,
@@ -33,18 +34,29 @@ export function AdminDashboard({
     { id: 'settings', label: 'ตั้งค่า', icon: '⚙' },
   ];
 
-  const approveAgent = (id) => {
-    setAgents((prev) => prev.map((a) => (a.id === id ? { ...a, status: 'approved' } : a)));
-    showToast('อนุมัตินายหน้าแล้ว');
+  const approveAgent = async (id) => {
+    const target = agents.find((a) => a.id === id);
+    if (target) {
+      const updated = { ...target, status: 'approved' };
+      setAgents((prev) => prev.map((a) => (a.id === id ? updated : a)));
+      await dbUpsertAgent(updated);
+      showToast('อนุมัตินายหน้าแล้ว');
+    }
   };
 
-  const approveAdvertiser = (id) => {
-    setAdvertisers((prev) => prev.map((a) => (a.id === id ? { ...a, status: 'approved' } : a)));
-    showToast('อนุมัติ Advertiser แล้ว');
+  const approveAdvertiser = async (id) => {
+    const target = advertisers.find((a) => a.id === id);
+    if (target) {
+      const updated = { ...target, status: 'approved' };
+      setAdvertisers((prev) => prev.map((a) => (a.id === id ? updated : a)));
+      await dbUpsertAdvertiser(updated);
+      showToast('อนุมัติ Advertiser แล้ว');
+    }
   };
 
-  const updateLeadField = (leadId, field, value) => {
+  const updateLeadField = async (leadId, field, value) => {
     setLeads((prev) => prev.map((l) => (l.id === leadId ? { ...l, [field]: value } : l)));
+    await dbUpdateLead(leadId, { [field]: value });
   };
 
   const pendingAgents = agents.filter((a) => a.status === 'pending');
@@ -58,7 +70,7 @@ export function AdminDashboard({
   return (
     <AppShell
       role="ผู้ดูแลระบบ"
-      name="CLUBROD Admin"
+      name="CUBROD Admin"
       tabs={tabs}
       activeTab={tab}
       onTab={setTab}
@@ -71,7 +83,7 @@ export function AdminDashboard({
             <div className="welcome-row">
               <div>
                 <span>ศูนย์ควบคุมระบบ</span>
-                <h1>ภาพรวม CLUBROD</h1>
+                <h1>ภาพรวม CUBROD</h1>
                 <p>ติดตามนายหน้า ลูกค้า การขาย และการจ่ายเงิน</p>
               </div>
               <button

@@ -23,8 +23,8 @@ export function CarCard({ car, onSelect }) {
       </button>
 
       <div className="market-car-photo" style={photoStyle}>
-        <span>{car.brand?.toUpperCase() || 'CLUBROD'}</span>
-        <b>CLUBROD</b>
+        <span>{car.brand?.toUpperCase() || 'CUBROD'}</span>
+        <b>CUBROD</b>
         <small>รถคัดสภาพ</small>
       </div>
 
