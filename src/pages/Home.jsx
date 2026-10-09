@@ -287,7 +287,7 @@ export function Home({ cars, onRegister, onAdvertiserRegister, onLogin, onMobile
                     </div>
 
                     <div className="filter-field-group">
-                      <label className="field-label">ผ่อนต่อเดือนไม่เกิน</label>
+                      <label className="field-label">ผ่อน/เดือนไม่เกิน</label>
                       <div className="select-input-wrapper">
                         <select
                           value={selectedMaxInstallment}
