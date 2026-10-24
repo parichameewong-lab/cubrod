@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { formatNumber, generateId } from '../../utils/formatters';
 import CarEditorForm from './CarEditorForm';
-import { dbUpsertCar, dbDeleteCar } from '../../services/db';
+import { dbUpsertCar } from '../../services/db';
 
 export function AdminCarManager({ cars, setCars, advertisers, carFeatures, showToast }) {
   const [editingCar, setEditingCar] = useState(null);
@@ -9,10 +9,13 @@ export function AdminCarManager({ cars, setCars, advertisers, carFeatures, showT
   const toggleVisibility = async (carId) => {
     const target = cars.find((c) => c.id === carId);
     if (!target) return;
+    const isCurrentlyVisible =
+      target.status === 'active' && target.publicVisible !== false && target.moderationStatus !== 'hidden';
     const updated = {
       ...target,
-      publicVisible: target.publicVisible === false ? true : false,
-      moderationStatus: target.publicVisible === false ? 'approved' : 'hidden',
+      status: isCurrentlyVisible ? 'paused' : 'active',
+      publicVisible: !isCurrentlyVisible,
+      moderationStatus: isCurrentlyVisible ? 'hidden' : 'approved',
     };
     setCars((prev) => prev.map((c) => (c.id === carId ? updated : c)));
     await dbUpsertCar(updated);
@@ -110,7 +113,8 @@ export function AdminCarManager({ cars, setCars, advertisers, carFeatures, showT
             <tbody>
               {cars.map((car) => {
                 const dealer = advertisers.find((a) => a.id === car.advertiserId);
-                const isVisible = car.publicVisible !== false && car.moderationStatus !== 'hidden';
+                const isVisible =
+                  car.status === 'active' && car.publicVisible !== false && car.moderationStatus !== 'hidden';
                 return (
                   <tr key={car.id}>
                     <td>

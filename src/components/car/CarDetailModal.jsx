@@ -1,10 +1,16 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { formatNumber, getCarImages, generateId } from '../../utils/formatters';
-import { createConversation } from '../../services/api';
+import {
+  sendCustomerChatMessage,
+  fetchCustomerDeviceConversation,
+  getCustomerChatProfile,
+} from '../../services/api';
 import { getFeatureIcon } from '../../data/carFeatures';
 import CarLoanCalculator from './CarLoanCalculator';
 
 export function CarDetailModal({ car, agents, attribution, onBack, onLead }) {
+  const savedProfile = getCustomerChatProfile();
+
   const [submitting, setSubmitting] = useState(false);
   const [activeTab, setActiveTab] = useState('chat'); // 'chat' or 'lead'
 
@@ -14,28 +20,45 @@ export function CarDetailModal({ car, agents, attribution, onBack, onLead }) {
   const [zoomScale, setZoomScale] = useState(1);
 
   // Chat tab state
-  const [chatName, setChatName] = useState('');
-  const [chatPhone, setChatPhone] = useState('');
+  const [chatName, setChatName] = useState(savedProfile.name || '');
+  const [chatPhone, setChatPhone] = useState(savedProfile.phone || '');
   const [chatMsg, setChatMsg] = useState('');
   const [chatPrivacyAccepted, setChatPrivacyAccepted] = useState(true);
-  const [chatSent, setChatSent] = useState(false);
+  const [customerConv, setCustomerConv] = useState(null);
 
   // Lead tab state
-  const [leadName, setLeadName] = useState('');
-  const [leadPhone, setLeadPhone] = useState('');
+  const [leadName, setLeadName] = useState(savedProfile.name || '');
+  const [leadPhone, setLeadPhone] = useState(savedProfile.phone || '');
   const [leadLine, setLeadLine] = useState('');
   const [leadContactTime, setLeadContactTime] = useState('13:00–16:00 น.');
   const [leadPrivacyAccepted, setLeadPrivacyAccepted] = useState(true);
 
   // Coupon form state
   const [showCouponForm, setShowCouponForm] = useState(false);
-  const [couponName, setCouponName] = useState('');
-  const [couponPhone, setCouponPhone] = useState('');
+  const [couponName, setCouponName] = useState(savedProfile.name || '');
+  const [couponPhone, setCouponPhone] = useState(savedProfile.phone || '');
   const [couponLine, setCouponLine] = useState('');
   const [couponAccepted, setCouponAccepted] = useState(true);
   const [couponSubmitted, setCouponSubmitted] = useState(false);
 
   const images = getCarImages(car);
+
+  const loadExistingCustomerChat = useCallback(async () => {
+    if (!car?.id) return;
+    const conv = await fetchCustomerDeviceConversation(car.id);
+    if (conv) {
+      setCustomerConv(conv);
+      if (conv.customerName && !chatName) setChatName(conv.customerName);
+      if (conv.customerPhone && !chatPhone) setChatPhone(conv.customerPhone);
+    } else {
+      setCustomerConv(null);
+    }
+  }, [car?.id]);
+
+  // Load chat once when opening the car page (Manual Refresh mode to save Supabase quota)
+  useEffect(() => {
+    loadExistingCustomerChat();
+  }, [loadExistingCustomerChat]);
 
   // Keyboard navigation for zoom modal
   useEffect(() => {
@@ -118,7 +141,7 @@ export function CarDetailModal({ car, agents, attribution, onBack, onLead }) {
       line: leadLine.trim(),
       contactTime: leadContactTime,
       createdAt: new Date().toISOString(),
-      leadStatus: 'รอนัดหมาย',
+      leadStatus: 'ใหม่',
       saleStatus: 'สนใจรถ',
       payoutStatus: 'ยังไม่เกิดสิทธิ์',
     };
@@ -149,7 +172,7 @@ export function CarDetailModal({ car, agents, attribution, onBack, onLead }) {
       line: couponLine.trim(),
       contactTime: 'ลงทะเบียนรับคูปองตรวจสภาพรถฟรี (มูลค่า 1,500 บาท)',
       createdAt: new Date().toISOString(),
-      leadStatus: 'รอนัดหมาย',
+      leadStatus: 'ใหม่',
       saleStatus: 'สนใจรถ',
       payoutStatus: 'ยังไม่เกิดสิทธิ์',
       type: 'COUPON_CLAIM',
@@ -168,13 +191,40 @@ export function CarDetailModal({ car, agents, attribution, onBack, onLead }) {
     }
     if (!chatMsg.trim()) return;
 
+    const isFirstMessageForCar = !customerConv;
     setSubmitting(true);
     try {
-      const fullMessage = `[ผู้สนทนา: ${chatName || 'ไม่ระบุชื่อ'} | เบอร์: ${chatPhone || 'ไม่ระบุเบอร์'}] ${chatMsg}`;
-      await createConversation(car.id, attribution, fullMessage);
-      setChatSent(true);
-    } catch {
-      setChatSent(true);
+      const updatedConv = await sendCustomerChatMessage({
+        carId: car.id,
+        carTitle: car.title,
+        agentCode: attribution || 'PLATFORM',
+        customerName: chatName.trim() || 'ลูกค้า',
+        customerPhone: chatPhone.trim(),
+        message: chatMsg.trim(),
+        sourceUrl: typeof window !== 'undefined' ? window.location.href : '',
+        sourcePage: agentObj ? `ลิงก์แนะนำโดย ${agentObj.name} (${agentObj.code})` : 'หน้ารายละเอียดรถ',
+      });
+
+      setCustomerConv(updatedConv);
+      setChatMsg('');
+
+      // If this is the customer's first chat message and they provided a phone number,
+      // also lock in the Affiliate Lead record automatically.
+      if (isFirstMessageForCar && chatPhone.trim() && onLead) {
+        onLead({
+          id: `lead-${generateId()}`,
+          carId: car.id,
+          agentCode: attribution || 'PLATFORM',
+          name: chatName.trim() || 'ลูกค้าจากแชต',
+          phone: chatPhone.trim(),
+          line: '',
+          contactTime: `ทักแชตสอบถาม: ${updatedConv.lastMessage}`,
+          createdAt: new Date().toISOString(),
+          leadStatus: 'ใหม่',
+          saleStatus: 'สนใจรถ',
+          payoutStatus: 'ยังไม่เกิดสิทธิ์',
+        });
+      }
     } finally {
       setSubmitting(false);
     }
@@ -458,7 +508,7 @@ export function CarDetailModal({ car, agents, attribution, onBack, onLead }) {
             </div>
 
             {/* Minimal Car Loan Installment Calculator (ล่างสุด) */}
-            <CarLoanCalculator car={car} />
+            <CarLoanCalculator car={car} onApplyPlan={handleApplyLoanPlan} />
           </div>
 
           {/* Right Column - Contact Form Box */}
@@ -483,73 +533,155 @@ export function CarDetailModal({ car, agents, attribution, onBack, onLead }) {
 
               {activeTab === 'chat' && (
                 <div className="chat-tab-content">
-                  <span className="lead-eyebrow">⚡ สอบถามรถคันนี้</span>
+                  <span className="lead-eyebrow">⚡ สอบถามรถคันนี้ (ไม่ต้องล็อกอิน)</span>
                   <h2 className="lead-title">
                     แชทกับทีม <strong>CUBROD</strong>
                   </h2>
                   <p className="lead-sub">
-                    ส่งคำถามถึงแอดมิน พร้อมแนบข้อมูลรถคันนี้ให้อัตโนมัติ
+                    แนบข้อมูล <strong>{car.title}</strong> อัตโนมัติ สามารถกลับมาเปิดดูคำตอบจากแอดมินได้ตลอดเวลา
                   </p>
 
-                  {chatSent ? (
-                    <div className="chat-sent-success">
-                      <div className="success-icon">✓</div>
-                      <h3>ส่งข้อความเรียบร้อยแล้ว</h3>
-                      <p>ทีมงานจะตอบกลับท่านผ่านระบบแชทโดยเร็วที่สุด</p>
-                      <button
-                        type="button"
-                        className="btn-submit-lead"
-                        onClick={() => setChatSent(false)}
+                  {/* DISPLAY CHAT HISTORY IF CUSTOMER ALREADY HAS MESSAGES */}
+                  {customerConv && Array.isArray(customerConv.messages) && customerConv.messages.length > 0 && (
+                    <div
+                      style={{
+                        background: '#f8fafc',
+                        border: '1px solid #e2e8f0',
+                        borderRadius: '12px',
+                        padding: '12px',
+                        marginBottom: '14px',
+                        maxHeight: '260px',
+                        overflowY: 'auto',
+                        display: 'grid',
+                        gap: '8px',
+                      }}
+                    >
+                      <div
+                        style={{
+                          display: 'flex',
+                          justifyContent: 'space-between',
+                          alignItems: 'center',
+                          fontSize: '12px',
+                          color: '#64748b',
+                          paddingBottom: '6px',
+                          borderBottom: '1px dashed #cbd5e1',
+                        }}
                       >
-                        ส่งข้อความเพิ่ม
-                      </button>
-                    </div>
-                  ) : (
-                    <form onSubmit={handleChatSend} className="customer-form">
-                      <label className="form-label-group">
-                        <span className="field-label">ชื่อ</span>
-                        <input
-                          type="text"
-                          placeholder="ชื่อสำหรับสนทนา"
-                          value={chatName}
-                          onChange={(e) => setChatName(e.target.value)}
-                        />
-                      </label>
-                      <label className="form-label-group">
-                        <span className="field-label">เบอร์โทรศัพท์</span>
-                        <input
-                          type="tel"
-                          placeholder="08X-XXX-XXXX"
-                          value={chatPhone}
-                          onChange={(e) => setChatPhone(e.target.value)}
-                        />
-                      </label>
-
-                      <div className="quick-questions-label">เลือกคำถามด่วน</div>
-                      <div className="quick-questions-chips">
-                        {quickQuestions.map((q, idx) => (
-                          <button
-                            key={idx}
-                            type="button"
-                            className={`chip-btn ${chatMsg === q ? 'selected' : ''}`}
-                            onClick={() => handleQuickQuestionClick(q)}
-                          >
-                            {q}
-                          </button>
-                        ))}
+                        <span>💬 ประวัติการพูดคุยของคุณ</span>
+                        <button
+                          type="button"
+                          onClick={loadExistingCustomerChat}
+                          style={{
+                            background: 'none',
+                            border: 'none',
+                            color: '#2563eb',
+                            cursor: 'pointer',
+                            fontSize: '12px',
+                            fontWeight: 600,
+                          }}
+                        >
+                          🔄 เช็คข้อความใหม่
+                        </button>
                       </div>
 
-                      <label className="form-label-group">
-                        <span className="field-label">คำถามของคุณ</span>
-                        <textarea
-                          rows={3}
-                          required
-                          placeholder={`เช่น ${car.title} ยังอยู่ไหมครับ?`}
-                          value={chatMsg}
-                          onChange={(e) => setChatMsg(e.target.value)}
-                        />
-                      </label>
+                      {customerConv.messages.map((m, idx) => {
+                        const isCustomer = m.sender !== 'admin';
+                        return (
+                          <div
+                            key={m.id || idx}
+                            style={{
+                              justifySelf: isCustomer ? 'end' : 'start',
+                              maxWidth: '88%',
+                              padding: '8px 12px',
+                              borderRadius: '12px',
+                              background: isCustomer ? '#ea580c' : '#ffffff',
+                              color: isCustomer ? '#ffffff' : '#0f172a',
+                              border: isCustomer ? 'none' : '1px solid #cbd5e1',
+                              fontSize: '13.5px',
+                              lineHeight: 1.45,
+                            }}
+                          >
+                            <div
+                              style={{
+                                fontSize: '11px',
+                                fontWeight: 700,
+                                opacity: 0.85,
+                                marginBottom: '2px',
+                              }}
+                            >
+                              {isCustomer ? 'คุณ' : '👑 แอดมิน CUBROD'}
+                            </div>
+                            <div>{m.text}</div>
+                            <div
+                              style={{
+                                fontSize: '10px',
+                                opacity: 0.75,
+                                marginTop: '3px',
+                                textAlign: 'right',
+                              }}
+                            >
+                              {m.time || 'เมื่อสักครู่'}
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  )}
 
+                  <form onSubmit={handleChatSend} className="customer-form">
+                    {!customerConv && (
+                      <>
+                        <label className="form-label-group">
+                          <span className="field-label">ชื่อของคุณ</span>
+                          <input
+                            type="text"
+                            required
+                            placeholder="ชื่อสำหรับสนทนา"
+                            value={chatName}
+                            onChange={(e) => setChatName(e.target.value)}
+                          />
+                        </label>
+                        <label className="form-label-group">
+                          <span className="field-label">เบอร์โทรศัพท์ (สำหรับเชื่อมต่อประวัติแชต)</span>
+                          <input
+                            type="tel"
+                            required
+                            placeholder="08X-XXX-XXXX"
+                            value={chatPhone}
+                            onChange={(e) => setChatPhone(e.target.value)}
+                          />
+                        </label>
+                      </>
+                    )}
+
+                    <div className="quick-questions-label">เลือกคำถามด่วน</div>
+                    <div className="quick-questions-chips">
+                      {quickQuestions.map((q, idx) => (
+                        <button
+                          key={idx}
+                          type="button"
+                          className={`chip-btn ${chatMsg === q ? 'selected' : ''}`}
+                          onClick={() => handleQuickQuestionClick(q)}
+                        >
+                          {q}
+                        </button>
+                      ))}
+                    </div>
+
+                    <label className="form-label-group">
+                      <span className="field-label">
+                        {customerConv ? 'พิมพ์ข้อความเพิ่มเติม' : 'คำถามของคุณ'}
+                      </span>
+                      <textarea
+                        rows={2}
+                        required
+                        placeholder={`เช่น ${car.title} ยังอยู่ไหมครับ?`}
+                        value={chatMsg}
+                        onChange={(e) => setChatMsg(e.target.value)}
+                      />
+                    </label>
+
+                    {!customerConv && (
                       <label className="check-privacy">
                         <input
                           type="checkbox"
@@ -558,16 +690,20 @@ export function CarDetailModal({ car, agents, attribution, onBack, onLead }) {
                         />
                         <span>ยอมรับนโยบายความเป็นส่วนตัว</span>
                       </label>
+                    )}
 
-                      <button
-                        type="submit"
-                        className="btn-submit-lead"
-                        disabled={submitting}
-                      >
-                        {submitting ? 'กำลังส่ง...' : 'เริ่มแชทกับทีมงาน →'}
-                      </button>
-                    </form>
-                  )}
+                    <button
+                      type="submit"
+                      className="btn-submit-lead"
+                      disabled={submitting}
+                    >
+                      {submitting
+                        ? 'กำลังส่งข้อความ...'
+                        : customerConv
+                        ? 'ส่งข้อความเพิ่ม →'
+                        : 'เริ่มแชทกับทีมงาน →'}
+                    </button>
+                  </form>
                 </div>
               )}
 

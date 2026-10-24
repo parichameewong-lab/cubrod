@@ -1,9 +1,8 @@
 import React, { useState } from 'react';
-import Header from '../layouts/Header';
 import Footer from '../layouts/Footer';
 import CarCard from '../components/car/CarCard';
 import CarDetailModal from '../components/car/CarDetailModal';
-import { formatNumber, getActivePublicCars } from '../utils/formatters';
+import { getActivePublicCars } from '../utils/formatters';
 
 export function AgentStorefront({
   agent,
@@ -166,7 +165,6 @@ export function AgentStorefront({
           onLead={(newLead) => {
             if (onLeadSubmitted) onLeadSubmitted(newLead);
             showToast('ส่งข้อมูลแล้ว นายหน้าและทีมงานจะติดต่อกลับโดยเร็ว');
-            setActiveCarModal(null);
           }}
         />
       )}

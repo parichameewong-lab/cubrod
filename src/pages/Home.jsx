@@ -3,7 +3,7 @@ import Header from '../layouts/Header';
 import Footer from '../layouts/Footer';
 import CarCard from '../components/car/CarCard';
 import IconBox from '../components/common/IconBox';
-import { formatNumber, getActivePublicCars, getBestPriceCars } from '../utils/formatters';
+import { formatNumber, getActivePublicCars, getBestPriceCars, getCarPhotoStyle } from '../utils/formatters';
 
 export function Home({ cars, onRegister, onAdvertiserRegister, onLogin, onMobileLogin, onSelect }) {
   const [selectedBrand, setSelectedBrand] = useState('');
@@ -323,7 +323,7 @@ export function Home({ cars, onRegister, onAdvertiserRegister, onLogin, onMobile
               onClick={() => onSelect(currentFeatured)}
             >
               <span className="selection-chip">CUBROD CHOICE</span>
-              <div className="market-car-art" style={{ background: currentFeatured.tone }}>
+              <div className="market-car-art" style={getCarPhotoStyle(currentFeatured)}>
                 <strong>{currentFeatured.brand?.toUpperCase()}</strong>
                 <i />
               </div>

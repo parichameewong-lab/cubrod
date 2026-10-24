@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { uploadInspectionReport } from '../../services/api';
+import { uploadInspectionPdf } from '../../services/mediaUpload';
 
 export function InspectionPdfUpload({ carId, name, url, onChange, showToast }) {
   const [loading, setLoading] = useState(false);
@@ -15,9 +15,11 @@ export function InspectionPdfUpload({ carId, name, url, onChange, showToast }) {
 
     setLoading(true);
     try {
-      const res = await uploadInspectionReport(carId, file);
+      const res = await uploadInspectionPdf(file, carId);
       onChange(res.name || file.name, res.url);
-      showToast('อัปโหลดรายงานตรวจสภาพแล้ว');
+      showToast(
+        `อัปโหลดรายงานตรวจสภาพแล้ว (${res.provider === 'cloudinary' ? 'Cloudinary CDN' : res.provider === 'supabase' ? 'Supabase Storage' : 'พร้อมใช้งาน'})`
+      );
     } catch (err) {
       showToast(err.message || 'อัปโหลดรายงานไม่สำเร็จ กรุณาลองใหม่');
     } finally {

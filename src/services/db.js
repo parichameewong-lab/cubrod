@@ -10,66 +10,90 @@ import { getStorage, setStorage, KEYS } from './storage';
 // -----------------------------------------------------------------------------
 // HELPER: Map Database snake_case to Frontend camelCase and vice versa
 // -----------------------------------------------------------------------------
-const mapCarFromDb = (item) => ({
-  id: item.id,
-  title: item.title || '',
-  brand: item.brand || '',
-  model: item.model || '',
-  submodel: item.submodel || '',
-  year: item.year || '',
-  price: Number(item.price || 0),
-  downPayment: Number(item.down_payment || 0),
-  monthlyPayment: Number(item.monthly_payment || 0),
-  mileage: Number(item.mileage || 0),
-  gear: item.gear || 'อัตโนมัติ',
-  fuel: item.fuel || 'เบนซิน',
-  color: item.color || '',
-  licensePlate: item.license_plate || '',
-  province: item.province || '',
-  status: item.status || 'active',
-  publicVisible: true,
-  affiliateEnabled: true,
-  isCubrodChoice: Boolean(item.is_cubrod_choice || item.is_clubrod_choice),
-  isClubrodChoice: Boolean(item.is_cubrod_choice || item.is_clubrod_choice),
-  featuredManual: Boolean(item.is_cubrod_choice || item.is_clubrod_choice),
-  totalCommission: Number(item.commission_total || 0),
-  agentCommission: Number(item.commission_agent || 0),
-  agentPercent: item.commission_total > 0
-    ? Math.round((Number(item.commission_agent || 0) / Number(item.commission_total)) * 100)
-    : 70,
-  advertiserId: item.advertiser_id || '',
-  images: Array.isArray(item.images) ? item.images : [],
-  features: Array.isArray(item.features) ? item.features : [],
-  inspectionPdfUrl: item.inspection_pdf_url || '',
-  createdAt: item.created_at,
-});
+const mapCarFromDb = (item) => {
+  const imageList = Array.isArray(item.images) ? item.images : [];
+  const pdfUrl = item.inspection_pdf_url || '';
+  return {
+    id: item.id,
+    title: item.title || '',
+    brand: item.brand || '',
+    model: item.model || '',
+    submodel: item.submodel || '',
+    vehicleType: item.submodel || 'รถเก๋ง',
+    year: String(item.year || ''),
+    price: Number(item.price || 0),
+    downPayment: Number(item.down_payment || 0),
+    monthlyPayment: Number(item.monthly_payment || 0),
+    mileage: Number(item.mileage || 0),
+    gear: item.gear || 'อัตโนมัติ',
+    transmission: item.gear || 'อัตโนมัติ',
+    fuel: item.fuel || 'เบนซิน',
+    color: item.color || '',
+    licensePlate: item.license_plate || '',
+    description: item.license_plate || '',
+    province: item.province || '',
+    status: item.status || 'active',
+    publicVisible: item.status !== 'hidden',
+    affiliateEnabled: true,
+    isCubrodChoice: Boolean(item.is_cubrod_choice || item.is_clubrod_choice),
+    isClubrodChoice: Boolean(item.is_cubrod_choice || item.is_clubrod_choice),
+    featuredManual: Boolean(item.is_cubrod_choice || item.is_clubrod_choice),
+    totalCommission: Number(item.commission_total || 0),
+    agentCommission: Number(item.commission_agent || 0),
+    agentPercent:
+      item.commission_total > 0
+        ? Math.round((Number(item.commission_agent || 0) / Number(item.commission_total)) * 100)
+        : 70,
+    advertiserId: item.advertiser_id || '',
+    images: imageList,
+    imageUrls: imageList,
+    imageUrl: imageList[0] || '',
+    features: Array.isArray(item.features) ? item.features : [],
+    inspectionPdfUrl: pdfUrl,
+    inspectionReportUrl: pdfUrl,
+    inspectionReportName: pdfUrl ? 'รายงานตรวจสภาพรถ.pdf' : '',
+    createdAt: item.created_at,
+  };
+};
 
-const mapCarToDb = (car) => ({
-  id: car.id,
-  title: car.title || `${car.brand || ''} ${car.model || ''}`,
-  brand: car.brand || '',
-  model: car.model || '',
-  submodel: car.submodel || '',
-  year: Number(car.year || 0),
-  price: Number(car.price || 0),
-  down_payment: Number(car.downPayment || 0),
-  monthly_payment: Number(car.monthlyPayment || 0),
-  mileage: Number(car.mileage || 0),
-  gear: car.gear || 'อัตโนมัติ',
-  fuel: car.fuel || 'เบนซิน',
-  color: car.color || '',
-  license_plate: car.licensePlate || '',
-  province: car.province || '',
-  status: car.status || 'active',
-  is_clubrod_choice: Boolean(car.isCubrodChoice || car.isClubrodChoice || car.featuredManual),
-  commission_total: Number(car.totalCommission || 0),
-  commission_agent: Number(car.agentCommission || (car.totalCommission ? (car.totalCommission * 0.7) : 0)),
-  advertiser_id: car.advertiserId || null,
-  images: Array.isArray(car.images) ? car.images : [],
-  features: Array.isArray(car.features) ? car.features : [],
-  inspection_pdf_url: car.inspectionPdfUrl || null,
-  updated_at: new Date().toISOString(),
-});
+const mapCarToDb = (car) => {
+  const imageList = Array.isArray(car.imageUrls)
+    ? car.imageUrls
+    : Array.isArray(car.images)
+    ? car.images
+    : car.imageUrl
+    ? [car.imageUrl]
+    : [];
+  const pdfUrl = car.inspectionReportUrl || car.inspectionPdfUrl || null;
+  return {
+    id: car.id,
+    title: car.title || `${car.brand || ''} ${car.model || ''}`.trim(),
+    brand: car.brand || '',
+    model: car.model || '',
+    submodel: car.vehicleType || car.submodel || '',
+    year: Number(car.year || new Date().getFullYear()),
+    price: Number(car.price || 0),
+    down_payment: Number(car.downPayment || 0),
+    monthly_payment: Number(car.monthlyPayment || 0),
+    mileage: Number(car.mileage || 0),
+    gear: car.transmission || car.gear || 'อัตโนมัติ',
+    fuel: car.fuel || 'เบนซิน',
+    color: car.color || '',
+    license_plate: car.description || car.licensePlate || '',
+    province: car.province || '',
+    status: car.status || 'active',
+    is_clubrod_choice: Boolean(car.isCubrodChoice || car.isClubrodChoice || car.featuredManual),
+    commission_total: Number(car.totalCommission || 0),
+    commission_agent: Number(
+      car.agentCommission || (car.totalCommission ? car.totalCommission * ((car.agentPercent || 70) / 100) : 0)
+    ),
+    advertiser_id: car.advertiserId && car.advertiserId !== 'admin' ? car.advertiserId : null,
+    images: imageList,
+    features: Array.isArray(car.features) ? car.features : [],
+    inspection_pdf_url: pdfUrl,
+    updated_at: new Date().toISOString(),
+  };
+};
 
 const mapAgentFromDb = (item) => ({
   id: item.id,
@@ -343,6 +367,38 @@ export const dbFetchCarFeatures = async () => {
     }
   }
   return getStorage(KEYS.CAR_FEATURES, DEFAULT_CAR_FEATURES);
+};
+
+export const dbUpsertCarFeature = async (feature) => {
+  if (isSupabaseConfigured()) {
+    try {
+      const { error } = await supabase.from('clubrod_car_features').upsert(
+        {
+          name: feature.name,
+          category: feature.category || 'comfort',
+          icon: feature.icon || '✓',
+        },
+        { onConflict: 'name' }
+      );
+      if (error) throw error;
+    } catch (e) {
+      console.warn('dbUpsertCarFeature Supabase error', e);
+    }
+  }
+};
+
+export const dbDeleteCarFeature = async (featureName) => {
+  if (isSupabaseConfigured()) {
+    try {
+      const { error } = await supabase
+        .from('clubrod_car_features')
+        .delete()
+        .eq('name', featureName);
+      if (error) throw error;
+    } catch (e) {
+      console.warn('dbDeleteCarFeature Supabase error', e);
+    }
+  }
 };
 
 // -----------------------------------------------------------------------------

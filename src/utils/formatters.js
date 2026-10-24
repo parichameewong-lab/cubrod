@@ -18,6 +18,7 @@ export const generateId = () => {
 export const getCarImages = (car) => {
   if (!car) return [];
   if (car.imageUrls?.length) return car.imageUrls;
+  if (car.images?.length) return car.images;
   if (car.imageUrl) return [car.imageUrl];
   return [];
 };

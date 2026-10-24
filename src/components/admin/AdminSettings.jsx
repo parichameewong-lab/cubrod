@@ -1,11 +1,19 @@
 import React, { useState } from 'react';
 import { CAR_FEATURE_CATEGORIES, DEFAULT_CAR_FEATURES } from '../../data/carFeatures';
+import { getCloudinaryConfig, saveCloudinaryConfig } from '../../services/mediaUpload';
+import { dbUpsertCarFeature, dbDeleteCarFeature } from '../../services/db';
 
 export function AdminSettings({ carFeatures, setCarFeatures, showToast }) {
   const [firstTouchDays, setFirstTouchDays] = useState(30);
   const [defaultAgentShare, setDefaultAgentShare] = useState(70);
   const [enableOtp, setEnableOtp] = useState(false);
   const [enableLeaderboard, setEnableLeaderboard] = useState(false);
+
+  // Cloudinary Configuration State
+  const initialCloud = getCloudinaryConfig();
+  const [cloudName, setCloudName] = useState(initialCloud.cloudName);
+  const [uploadPreset, setUploadPreset] = useState(initialCloud.uploadPreset);
+  const [cloudSaved, setCloudSaved] = useState(initialCloud.isConfigured);
 
   // Admin Car Features Management State
   const [selectedCatFilter, setSelectedCatFilter] = useState('all');
@@ -20,7 +28,18 @@ export function AdminSettings({ carFeatures, setCarFeatures, showToast }) {
 
   const quickIcons = ['✨', '🛡️', '💺', '🪟', '❄️', '📺', '📻', '📱', '📷', '🔘', '🔑', '🏎️', '🚘', '🛞', '🔧', '⚡', '💡', '🛑', '☀️'];
 
-  const handleAddFeature = (e) => {
+  const handleSaveCloudinary = (e) => {
+    e.preventDefault();
+    saveCloudinaryConfig(cloudName, uploadPreset);
+    setCloudSaved(Boolean(cloudName.trim() && uploadPreset.trim()));
+    if (cloudName.trim() && uploadPreset.trim()) {
+      showToast('บันทึกการเชื่อมต่อ Cloudinary CDN เรียบร้อยแล้ว');
+    } else {
+      showToast('ล้างค่า Cloudinary แล้ว (ใช้โหมดบีบอัด WebP อัตโนมัติ)');
+    }
+  };
+
+  const handleAddFeature = async (e) => {
     e.preventDefault();
     const trimmed = newFeatureName.trim();
     if (!trimmed) {
@@ -42,15 +61,17 @@ export function AdminSettings({ carFeatures, setCarFeatures, showToast }) {
     const updated = [...currentFeatures, newOption];
     setCarFeatures(updated);
     setNewFeatureName('');
+    await dbUpsertCarFeature(newOption);
     showToast(`เพิ่มออฟชั่น "${trimmed}" เข้าสู่ระบบกลางเรียบร้อยแล้ว`);
   };
 
-  const handleDeleteFeature = (featureName) => {
+  const handleDeleteFeature = async (featureName) => {
     if (!window.confirm(`คุณแน่ใจหรือไม่ว่าต้องการลบออฟชั่น "${featureName}" ออกจากระบบ?`)) {
       return;
     }
     const updated = currentFeatures.filter((f) => f.name !== featureName);
     setCarFeatures(updated);
+    await dbDeleteCarFeature(featureName);
     showToast(`ลบออฟชั่น "${featureName}" เรียบร้อยแล้ว`);
   };
 
@@ -73,7 +94,7 @@ export function AdminSettings({ carFeatures, setCarFeatures, showToast }) {
       <div className="page-title">
         <div>
           <h1>ตั้งค่าระบบ</h1>
-          <p>กำหนดส่วนแบ่งค่าคอมมิชชัน กฎ First-touch และจัดการออฟชั่นมาตรฐานของรถ</p>
+          <p>กำหนดส่วนแบ่งค่าคอมมิชชัน พื้นที่เก็บรูปภาพ Cloudinary และจัดการออฟชั่นมาตรฐานของรถ</p>
         </div>
       </div>
 
@@ -116,31 +137,44 @@ export function AdminSettings({ carFeatures, setCarFeatures, showToast }) {
           </button>
         </section>
 
-        {/* SECTION 2: FEATURES & SECURITY */}
+        {/* SECTION 2: CLOUDINARY IMAGE STORAGE SETUP */}
         <section className="panel">
-          <h2>ฟีเจอร์และความปลอดภัย</h2>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '8px' }}>
+            <h2>☁️ พื้นที่เก็บรูปภาพ (Cloudinary Free 25GB)</h2>
+            <span className={`badge ${cloudSaved ? 'success' : 'warning'}`}>
+              {cloudSaved ? 'เชื่อมต่อแล้ว' : 'โหมด WebP อัตโนมัติ'}
+            </span>
+          </div>
 
-          <button
-            type="button"
-            className="toggle-row"
-            onClick={() => setEnableOtp(!enableOtp)}
-          >
-            <span>ระบบยืนยันตัวตน OTP สมัครสมาชิก</span>
-            <i className={enableOtp ? 'on' : ''}>
-              <b />
-            </i>
-          </button>
+          <form onSubmit={handleSaveCloudinary} style={{ display: 'grid', gap: '12px', marginTop: '10px' }}>
+            <label style={{ display: 'grid', gap: '4px' }}>
+              <span>Cloudinary Cloud Name</span>
+              <input
+                type="text"
+                placeholder="เช่น dxyz12345"
+                value={cloudName}
+                onChange={(e) => setCloudName(e.target.value)}
+              />
+            </label>
 
-          <button
-            type="button"
-            className="toggle-row"
-            onClick={() => setEnableLeaderboard(!enableLeaderboard)}
-          >
-            <span>แสดงอันดับนายหน้ายอดเยี่ยมประจำเดือน (Leaderboard)</span>
-            <i className={enableLeaderboard ? 'on' : ''}>
-              <b />
-            </i>
-          </button>
+            <label style={{ display: 'grid', gap: '4px' }}>
+              <span>Upload Preset (โหมด Unsigned)</span>
+              <input
+                type="text"
+                placeholder="เช่น clubrod_unsigned"
+                value={uploadPreset}
+                onChange={(e) => setUploadPreset(e.target.value)}
+              />
+            </label>
+
+            <p className="hint" style={{ margin: 0 }}>
+              * ระบบบีบอัดรูปเป็น WebP อัตโนมัติทุกครั้งก่อนอัปโหลด ช่วยให้โควตาฟรี 25 GB เก็บรูปรถได้หลายหมื่นรูปโดยไม่กระทบฐานข้อมูล kaitong
+            </p>
+
+            <button type="submit" className="button">
+              บันทึกตั้งค่า Cloudinary
+            </button>
+          </form>
         </section>
       </div>
 
@@ -170,7 +204,7 @@ export function AdminSettings({ carFeatures, setCarFeatures, showToast }) {
         <form onSubmit={handleAddFeature} className="admin-add-feature-box">
           <div className="add-feature-header">
             <strong>+ เพิ่มออฟชั่นใหม่เข้าสู่ระบบ</strong>
-            <small>ออฟชั่นที่เพิ่มจะปรากฏให้ผู้ลงขายรถทุกคนเลือกได้ทันที</small>
+            <small>ออฟชั่นที่เพิ่มจะถูกบันทึกลงฐานข้อมูลและปรากฏให้ผู้ลงขายรถทุกคนเลือกได้ทันที</small>
           </div>
 
           <div className="add-feature-form-row">
@@ -299,4 +333,3 @@ export function AdminSettings({ carFeatures, setCarFeatures, showToast }) {
 }
 
 export default AdminSettings;
-

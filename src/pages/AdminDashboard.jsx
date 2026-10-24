@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import AppShell from '../layouts/AppShell';
 import StatCard from '../components/common/StatCard';
 import AdminCarManager from '../components/car/AdminCarManager';
@@ -193,7 +193,9 @@ export function AdminDashboard({
         )}
 
         {/* TAB 2: MESSAGES (ข้อความ) */}
-        {tab === 'messages' && <ChatWidget showToast={showToast} />}
+        {tab === 'messages' && (
+          <ChatWidget cars={cars} agents={agents} showToast={showToast} />
+        )}
 
         {/* TAB 3: AGENTS (จัดการนายหน้า) */}
         {tab === 'agents' && (

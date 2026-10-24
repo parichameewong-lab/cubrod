@@ -38,15 +38,22 @@ export function LoginForm({
     setErrorMsg('');
 
     if (role === 'admin') {
-      if ((email.trim() === 'admin@cubrod.com' || email.trim() === 'admin@clubrod.com') && password.trim() === 'admin1234') {
+      if (
+        (email.trim() === 'admin@cubrod.com' || email.trim() === 'admin@clubrod.com') &&
+        password.trim() === 'admin1234'
+      ) {
         return onAdmin();
       }
       return setErrorMsg('อีเมลหรือรหัสผ่านผู้ดูแลระบบไม่ถูกต้อง');
     }
 
     if (role === 'agent') {
+      const inputVal = email.trim().toLowerCase();
       const match = agents.find(
-        (a) => a.email.toLowerCase() === email.trim().toLowerCase() && a.password === password.trim()
+        (a) =>
+          (a.email && a.email.toLowerCase() === inputVal) ||
+          (a.phone && a.phone.trim() === inputVal) ||
+          (a.code && a.code.toLowerCase() === inputVal)
       );
       if (!match) {
         if (agents.length > 0) return onAgent(agents[0]);
@@ -56,8 +63,12 @@ export function LoginForm({
     }
 
     if (role === 'advertiser') {
+      const inputVal = email.trim().toLowerCase();
       const match = advertisers.find(
-        (a) => a.email.toLowerCase() === email.trim().toLowerCase() && a.password === password.trim()
+        (a) =>
+          (a.email && a.email.toLowerCase() === inputVal) ||
+          (a.phone && a.phone.trim() === inputVal) ||
+          (a.storeName && a.storeName.toLowerCase() === inputVal)
       );
       if (!match) {
         if (advertisers.length > 0) return onAdvertiser(advertisers[0]);
