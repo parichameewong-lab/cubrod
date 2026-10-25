@@ -31,9 +31,9 @@ export function MultiImageUpload({ images, onChange, showToast }) {
         files.map((file) =>
           uploadCompressedImage(file, {
             folder: 'clubrod/cars',
-            maxWidth: 1600,
-            maxHeight: 1600,
-            quality: 0.82,
+            maxWidth: 1200,
+            maxHeight: 1200,
+            quality: 0.75,
           })
         )
       );
@@ -79,39 +79,47 @@ export function MultiImageUpload({ images, onChange, showToast }) {
     onChange(images.filter((_, i) => i !== index));
   };
 
+  const setAsCover = (index) => {
+    if (index === 0) return;
+    const picked = images[index];
+    const rest = images.filter((_, i) => i !== index);
+    onChange([picked, ...rest]);
+    showToast('ตั้งเป็นภาพหลักเรียบร้อยแล้ว');
+  };
+
   return (
     <div className="full-field multi-image-uploader">
       <div className="uploader-header">
-        <div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+        <div className="uploader-title-block">
+          <div className="uploader-title-row">
             <strong>รูปภาพรถยนต์ ({images.length}/15 รูป)</strong>
             <span
               className="badge"
               style={{
-                fontSize: '11px',
+                fontSize: '10.5px',
                 padding: '2px 8px',
                 background: cloudCfg.isConfigured ? '#dcfce7' : '#eff6ff',
                 color: cloudCfg.isConfigured ? '#166534' : '#1d4ed8',
                 borderRadius: '999px',
               }}
             >
-              {cloudCfg.isConfigured ? '☁️ เชื่อมต่อ Cloudinary CDN แล้ว' : '⚡ บีบอัด WebP อัตโนมัติ'}
+              {cloudCfg.isConfigured ? '☁️ Cloudinary CDN' : '⚡ ย่อ WebP ประหยัดพื้นที่'}
             </span>
           </div>
           <small>
-            ระบบย่อและแปลงภาพเป็น WebP อัตโนมัติก่อนบันทึก รูปแรกจะเป็นภาพหลักของประกาศ
+            ระบบย่อขนาดภาพเป็น WebP อัตโนมัติ รูปแรกคือภาพหลัก (คลิกที่รูปเพื่อสลับเป็นภาพหลักได้)
           </small>
         </div>
-        <div style={{ display: 'flex', gap: '8px', alignItems: 'center', flexWrap: 'wrap' }}>
+        <div className="uploader-actions-row">
           <button
             type="button"
-            className="button small secondary"
+            className="button small secondary compact-btn"
             onClick={() => setShowUrlBox((prev) => !prev)}
           >
-            🔗 เพิ่มจากลิงก์ URL
+            🔗 ลิงก์ URL
           </button>
-          <label className="upload-button" style={{ opacity: uploading ? 0.6 : 1 }}>
-            {uploading ? '⏳ กำลังบีบอัดและอัปโหลด...' : '+ เลือกรูปภาพ'}
+          <label className="upload-button compact-upload-btn" style={{ opacity: uploading ? 0.6 : 1 }}>
+            {uploading ? '⏳ กำลังย่อและอัปโหลด...' : '+ เลือกรูปภาพ'}
             <input
               type="file"
               accept="image/*"
@@ -127,57 +135,87 @@ export function MultiImageUpload({ images, onChange, showToast }) {
       </div>
 
       {showUrlBox && (
-        <div
-          style={{
-            display: 'flex',
-            gap: '8px',
-            marginTop: '10px',
-            marginBottom: '10px',
-            padding: '10px 12px',
-            background: '#f8fafc',
-            borderRadius: '10px',
-            border: '1px solid #e2e8f0',
-          }}
-        >
+        <div className="uploader-url-box">
           <input
             type="url"
             placeholder="วางลิงก์รูปภาพ เช่น https://.../car.jpg"
             value={urlInput}
             onChange={(e) => setUrlInput(e.target.value)}
-            style={{ flex: 1 }}
           />
-          <button type="button" className="button small" onClick={handleAddExternalUrl}>
+          <button type="button" className="button small compact-btn" onClick={handleAddExternalUrl}>
             เพิ่มรูป
           </button>
         </div>
       )}
 
-      <div className="image-grid-preview">
-        {images.map((url, i) => (
-          <div key={i} className="preview-item">
-            <img src={url} alt={`รูปที่ ${i + 1}`} />
-            {i === 0 && <span className="cover-badge">ภาพหลัก</span>}
-            <button
-              type="button"
-              className="remove-btn"
-              onClick={() => removeImage(i)}
-              aria-label={`ลบรูปที่ ${i + 1}`}
+      {images.length > 0 ? (
+        <div className="image-grid-preview">
+          {images.map((url, i) => (
+            <div
+              key={i}
+              className={`preview-item ${i === 0 ? 'is-cover' : ''}`}
+              onClick={() => setAsCover(i)}
+              title={i === 0 ? 'ภาพหลักของประกาศ' : 'คลิกเพื่อตั้งเป็นภาพหลัก'}
             >
-              ×
-            </button>
-          </div>
-        ))}
-        {images.length === 0 && (
-          <div className="empty-uploader-placeholder">
-            <span>📷</span>
-            <p>
+              <img src={url} alt={`รูปที่ ${i + 1}`} loading="lazy" />
+              {i === 0 ? (
+                <span className="cover-badge">★ ภาพหลัก</span>
+              ) : (
+                <span className="index-badge">#{i + 1}</span>
+              )}
+              <button
+                type="button"
+                className="remove-btn"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  removeImage(i);
+                }}
+                aria-label={`ลบรูปที่ ${i + 1}`}
+              >
+                ×
+              </button>
+            </div>
+          ))}
+          {images.length < 15 && (
+            <label className="preview-add-more-tile" style={{ opacity: uploading ? 0.6 : 1 }}>
+              <span>+</span>
+              <small>{uploading ? 'กำลังโหลด...' : 'เพิ่มรูป'}</small>
+              <input
+                type="file"
+                accept="image/*"
+                multiple
+                disabled={uploading}
+                onChange={(e) => {
+                  handleFiles(e.target.files);
+                  e.currentTarget.value = '';
+                }}
+              />
+            </label>
+          )}
+        </div>
+      ) : (
+        <label className="empty-uploader-placeholder" style={{ opacity: uploading ? 0.6 : 1 }}>
+          <span className="empty-cam-icon">📷</span>
+          <div className="empty-cam-text">
+            <strong>
               {uploading
-                ? 'กำลังบีบอัดรูปเป็น WebP และอัปโหลดขึ้น Cloud...'
-                : 'ยังไม่มีรูปภาพ แนบรูปสภาพรถ ห้องโดยสาร และเรือนไมล์'}
-            </p>
+                ? 'กำลังย่อขนาดรูปเป็น WebP และอัปโหลด...'
+                : 'คลิกเพื่อเลือกรูปภาพรถยนต์ (สูงสุด 15 รูป)'}
+            </strong>
+            <small>แนบรูปมุมหน้ารถ ห้องโดยสาร และเรือนไมล์ · ย่อขนาดอัตโนมัติประหยัดพื้นที่</small>
           </div>
-        )}
-      </div>
+          <input
+            type="file"
+            accept="image/*"
+            multiple
+            disabled={uploading}
+            onChange={(e) => {
+              handleFiles(e.target.files);
+              e.currentTarget.value = '';
+            }}
+          />
+        </label>
+      )}
     </div>
   );
 }

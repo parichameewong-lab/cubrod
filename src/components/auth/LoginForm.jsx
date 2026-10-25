@@ -207,39 +207,38 @@ export function LoginForm({
         )}
       </div>
 
-      {/* Quick Test Login Helpers */}
-      <div className="quick-login-box">
-        <div className="quick-title-row">
-          <span className="pulse-dot">●</span>
-          <span>ปุ่มทางลัดเข้าสู่ระบบสำหรับทดสอบ (Demo)</span>
-        </div>
-        <div className="quick-buttons-row">
-          <button
-            type="button"
-            className="quick-chip agent-chip"
-            onClick={() => handleQuickLogin('agent')}
-          >
-            <span className="chip-icon">👤</span> นายหน้า
-          </button>
-          <button
-            type="button"
-            className="quick-chip dealer-chip"
-            onClick={() => handleQuickLogin('advertiser')}
-          >
-            <span className="chip-icon">🏪</span> เต็นท์รถ
-          </button>
-
-          {includeAdmin && (
+      {/* Quick Test Login Helpers (แสดงเฉพาะตอนรันทดสอบ Local Dev เท่านั้น เมื่อ Deploy จริงจะซ่อนอัตโนมัติ) */}
+      {import.meta.env.DEV && (
+        <div className="quick-login-box">
+          <div className="quick-title-row">
+            <span className="pulse-dot">●</span>
+            <span>ทางลัดทดสอบระบบ (แสดงเฉพาะโหมดพัฒนา Local เท่านั้น)</span>
+          </div>
+          <div className="quick-buttons-row">
+            <button
+              type="button"
+              className="quick-chip agent-chip"
+              onClick={() => handleQuickLogin('agent')}
+            >
+              <span className="chip-icon">👤</span> นายหน้า
+            </button>
+            <button
+              type="button"
+              className="quick-chip dealer-chip"
+              onClick={() => handleQuickLogin('advertiser')}
+            >
+              <span className="chip-icon">🏪</span> เต็นท์รถ
+            </button>
             <button
               type="button"
               className="quick-chip admin-chip"
               onClick={() => handleQuickLogin('admin')}
             >
-              <span className="chip-icon">👑</span> แอดมิน
+              <span className="chip-icon">👑</span> แอดมิน (Demo)
             </button>
-          )}
+          </div>
         </div>
-      </div>
+      )}
     </AuthLayoutCard>
   );
 }

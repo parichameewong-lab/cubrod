@@ -53,7 +53,7 @@ export const saveCloudinaryConfig = (cloudName, uploadPreset) => {
  */
 export const compressImageToWebP = (
   file,
-  { maxWidth = 1600, maxHeight = 1600, quality = 0.82 } = {}
+  { maxWidth = 1280, maxHeight = 1280, quality = 0.76 } = {}
 ) => {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
@@ -178,7 +178,7 @@ const uploadToSupabaseStorage = async (file, folder = 'cars') => {
  */
 export const uploadCompressedImage = async (
   rawFile,
-  { folder = 'clubrod/cars', maxWidth = 1600, maxHeight = 1600, quality = 0.82 } = {}
+  { folder = 'clubrod/cars', maxWidth = 1280, maxHeight = 1280, quality = 0.76 } = {}
 ) => {
   // Step 1: Compress & convert to WebP on client
   const compressed = await compressImageToWebP(rawFile, {

@@ -3,21 +3,18 @@
 -- ปลอดภัย 100% สามารถรันใน Supabase เดียวกับ kaitong ได้โดยไม่ชนกับตารางเดิม
 -- ==============================================================================
 
--- 1. Enable UUID Extension (ถ้ายังไม่มี)
-CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
-
--- 2. Master Car Features (ออฟชั่นและคุณสมบัติรถยนต์ส่วนกลาง)
+-- 1. Master Car Features (ออฟชั่นและคุณสมบัติรถยนต์ส่วนกลาง)
 CREATE TABLE IF NOT EXISTS public.clubrod_car_features (
-    id TEXT PRIMARY KEY DEFAULT uuid_generate_v4()::text,
+    id TEXT PRIMARY KEY DEFAULT gen_random_uuid()::text,
     name TEXT NOT NULL UNIQUE,
     category TEXT NOT NULL DEFAULT 'comfort',
     icon TEXT DEFAULT '✓',
     created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
--- 3. Advertisers (เต็นท์รถ / ผู้ลงประกาศ)
+-- 2. Advertisers (เต็นท์รถ / ผู้ลงประกาศ)
 CREATE TABLE IF NOT EXISTS public.clubrod_advertisers (
-    id TEXT PRIMARY KEY DEFAULT uuid_generate_v4()::text,
+    id TEXT PRIMARY KEY DEFAULT gen_random_uuid()::text,
     store_name TEXT NOT NULL,
     owner_name TEXT NOT NULL,
     phone TEXT NOT NULL,
@@ -30,9 +27,9 @@ CREATE TABLE IF NOT EXISTS public.clubrod_advertisers (
     updated_at TIMESTAMPTZ DEFAULT NOW()
 );
 
--- 4. Agents (นายหน้า Affiliate)
+-- 3. Agents (นายหน้า Affiliate)
 CREATE TABLE IF NOT EXISTS public.clubrod_agents (
-    id TEXT PRIMARY KEY DEFAULT uuid_generate_v4()::text,
+    id TEXT PRIMARY KEY DEFAULT gen_random_uuid()::text,
     code TEXT NOT NULL UNIQUE,
     name TEXT NOT NULL,
     phone TEXT NOT NULL,
@@ -45,9 +42,9 @@ CREATE TABLE IF NOT EXISTS public.clubrod_agents (
     updated_at TIMESTAMPTZ DEFAULT NOW()
 );
 
--- 5. Cars (รายการรถยนต์)
+-- 4. Cars (รายการรถยนต์)
 CREATE TABLE IF NOT EXISTS public.clubrod_cars (
-    id TEXT PRIMARY KEY DEFAULT uuid_generate_v4()::text,
+    id TEXT PRIMARY KEY DEFAULT gen_random_uuid()::text,
     advertiser_id TEXT REFERENCES public.clubrod_advertisers(id) ON DELETE SET NULL,
     title TEXT NOT NULL,
     brand TEXT NOT NULL,
@@ -74,9 +71,9 @@ CREATE TABLE IF NOT EXISTS public.clubrod_cars (
     updated_at TIMESTAMPTZ DEFAULT NOW()
 );
 
--- 6. Leads (ข้อมูลลูกค้าและสถานะการขาย)
+-- 5. Leads (ข้อมูลลูกค้าและสถานะการขาย)
 CREATE TABLE IF NOT EXISTS public.clubrod_leads (
-    id TEXT PRIMARY KEY DEFAULT uuid_generate_v4()::text,
+    id TEXT PRIMARY KEY DEFAULT gen_random_uuid()::text,
     car_id TEXT REFERENCES public.clubrod_cars(id) ON DELETE SET NULL,
     agent_code TEXT NOT NULL DEFAULT 'PLATFORM',
     name TEXT NOT NULL,
@@ -92,9 +89,9 @@ CREATE TABLE IF NOT EXISTS public.clubrod_leads (
     updated_at TIMESTAMPTZ DEFAULT NOW()
 );
 
--- 7. Chat Conversations (ระบบแชตสด)
+-- 6. Chat Conversations (ระบบแชตสด)
 CREATE TABLE IF NOT EXISTS public.clubrod_chats (
-    id TEXT PRIMARY KEY DEFAULT uuid_generate_v4()::text,
+    id TEXT PRIMARY KEY DEFAULT gen_random_uuid()::text,
     car_id TEXT,
     agent_code TEXT DEFAULT 'PLATFORM',
     customer_name TEXT,
@@ -108,7 +105,6 @@ CREATE TABLE IF NOT EXISTS public.clubrod_chats (
 
 -- ==============================================================================
 -- ROW LEVEL SECURITY (RLS) POLICIES
--- เปิดให้ Client ผ่าน Anon Key อ่านและเขียนข้อมูลได้ตามสิทธิ์
 -- ==============================================================================
 
 ALTER TABLE public.clubrod_car_features ENABLE ROW LEVEL SECURITY;
@@ -118,7 +114,6 @@ ALTER TABLE public.clubrod_cars ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.clubrod_leads ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.clubrod_chats ENABLE ROW LEVEL SECURITY;
 
--- Anonymous / Authenticated Read & Write Policies
 DROP POLICY IF EXISTS "Allow public read on features" ON public.clubrod_car_features;
 CREATE POLICY "Allow public read on features" ON public.clubrod_car_features FOR ALL USING (true) WITH CHECK (true);
 
