@@ -5091,3 +5091,548 @@
     font-size: 8px;
   }
 }
+
+
+/* ==========================================================================
+   COMPACT & CLEAN MULTI-IMAGE UPLOADER (ขั้นตอนอัปโหลดรูปรถ ประหยัดพื้นที่และสะอาดตา)
+   ========================================================================== */
+
+.multi-image-uploader {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 14px;
+  padding: 14px 16px;
+}
+
+.uploader-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 12px;
+}
+
+.uploader-title-block {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.uploader-title-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.uploader-title-row strong {
+  font-size: 13.5px;
+  font-weight: 800;
+  color: #081f3d;
+}
+
+.uploader-title-block small {
+  font-size: 11.5px;
+  color: #64748b;
+  line-height: 1.4;
+}
+
+.uploader-actions-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.uploader-actions-row .compact-btn {
+  padding: 7px 12px;
+  font-size: 12px;
+  border-radius: 8px;
+  background: #f8fafc;
+  color: #334155;
+  border: 1px solid #cbd5e1;
+  box-shadow: none;
+  font-weight: 700;
+}
+
+.uploader-actions-row .compact-btn:hover {
+  background: #f1f5f9;
+  border-color: #94a3b8;
+  color: #0f172a;
+}
+
+.uploader-actions-row .compact-upload-btn {
+  padding: 7px 14px;
+  font-size: 12px;
+  font-weight: 800;
+  border-radius: 8px;
+  background: #fff7ed;
+  border: 1px dashed #fb923c;
+  color: #ea580c !important;
+  transition: all 0.18s ease;
+}
+
+.uploader-actions-row .compact-upload-btn:hover {
+  background: #ffedd5;
+  border-color: #ea580c;
+}
+
+.uploader-url-box {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 12px;
+  padding: 8px 10px;
+  background: #f8fafc;
+  border-radius: 10px;
+  border: 1px solid #e2e8f0;
+}
+
+.uploader-url-box input {
+  flex: 1;
+  padding: 7px 12px !important;
+  font-size: 12.5px !important;
+  border-radius: 8px !important;
+  border: 1px solid #cbd5e1 !important;
+  background: #ffffff !important;
+}
+
+/* Compact Thumbnail Grid: 6-8 per row on desktop, 4 on tablet, 3 on mobile */
+.image-grid-preview {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(96px, 1fr));
+  gap: 8px;
+  align-items: stretch;
+}
+
+.preview-item {
+  position: relative;
+  aspect-ratio: 4 / 3;
+  height: 74px;
+  width: 100%;
+  border-radius: 9px;
+  overflow: hidden;
+  background: #f1f5f9;
+  border: 1.5px solid #e2e8f0;
+  cursor: pointer;
+  transition: transform 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.preview-item:hover {
+  border-color: #94a3b8;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 10px rgba(15, 23, 42, 0.08);
+}
+
+.preview-item.is-cover {
+  border: 2px solid #f97316;
+  box-shadow: 0 2px 8px rgba(249, 115, 22, 0.18);
+}
+
+.preview-item img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.preview-item .cover-badge {
+  position: absolute;
+  bottom: 4px;
+  left: 4px;
+  background: rgba(249, 115, 22, 0.92);
+  color: #ffffff;
+  font-size: 9.5px;
+  font-weight: 800;
+  padding: 2px 6px;
+  border-radius: 5px;
+  line-height: 1.2;
+  letter-spacing: 0.2px;
+  pointer-events: none;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
+}
+
+.preview-item .index-badge {
+  position: absolute;
+  bottom: 4px;
+  left: 4px;
+  background: rgba(15, 23, 42, 0.65);
+  color: #ffffff;
+  font-size: 9px;
+  font-weight: 700;
+  padding: 1.5px 5px;
+  border-radius: 4px;
+  line-height: 1.2;
+  pointer-events: none;
+}
+
+.preview-item .remove-btn {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: rgba(15, 23, 42, 0.72);
+  color: #ffffff;
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  font-size: 13px;
+  font-weight: 800;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  padding: 0;
+  transition: background 0.15s ease, transform 0.15s ease;
+}
+
+.preview-item .remove-btn:hover {
+  background: #ef4444;
+  transform: scale(1.08);
+}
+
+/* Add more tile inside grid */
+.preview-add-more-tile {
+  aspect-ratio: 4 / 3;
+  height: 74px;
+  width: 100%;
+  border-radius: 9px;
+  border: 1.5px dashed #cbd5e1;
+  background: #f8fafc;
+  color: #64748b;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.preview-add-more-tile:hover {
+  border-color: #f97316;
+  background: #fff7ed;
+  color: #ea580c;
+}
+
+.preview-add-more-tile span {
+  font-size: 18px;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.preview-add-more-tile small {
+  font-size: 10px;
+  font-weight: 700;
+}
+
+.preview-add-more-tile input {
+  display: none;
+}
+
+/* Slim & Clean Empty Placeholder */
+.empty-uploader-placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 14px 16px;
+  border: 1.5px dashed #cbd5e1;
+  border-radius: 10px;
+  background: #f8fafc;
+  cursor: pointer;
+  transition: all 0.18s ease;
+}
+
+.empty-uploader-placeholder:hover {
+  border-color: #f97316;
+  background: #fffaf5;
+}
+
+.empty-uploader-placeholder input {
+  display: none;
+}
+
+.empty-cam-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 9px;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  flex-shrink: 0;
+}
+
+.empty-cam-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  text-align: left;
+}
+
+.empty-cam-text strong {
+  font-size: 12.5px;
+  font-weight: 700;
+  color: #1e293b;
+}
+
+.empty-cam-text small {
+  font-size: 11px;
+  color: #64748b;
+}
+
+.pdf-upload-divider {
+  height: 1px;
+  background: #e2e8f0;
+  margin: 12px 0;
+}
+
+/* Compact Inspection PDF row inside form */
+.car-form-container .inspection-report-uploader {
+  padding: 10px 14px;
+  border-radius: 12px;
+  background: #ffffff;
+  gap: 12px;
+  grid-template-columns: 40px minmax(0, 1fr) auto;
+}
+
+.car-form-container .report-icon {
+  width: 38px;
+  height: 38px;
+  border-radius: 9px;
+  font-size: 10px;
+}
+
+@media (max-width: 600px) {
+  .multi-image-uploader {
+    padding: 12px;
+  }
+
+  .uploader-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+
+  .uploader-actions-row {
+    width: 100%;
+  }
+
+  .uploader-actions-row .compact-btn,
+  .uploader-actions-row .compact-upload-btn {
+    flex: 1;
+    text-align: center;
+    justify-content: center;
+  }
+
+  .image-grid-preview {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 6px;
+  }
+
+  .preview-item,
+  .preview-add-more-tile {
+    height: 68px;
+  }
+}
+
+/* ==========================================================================
+   MOBILE SYMMETRY FIX — Car Detail Page
+   Prevents thumbnail row from stretching the grid column past the viewport.
+   ========================================================================== */
+.detail-grid {
+  grid-template-columns: minmax(0, 1fr) 380px;
+}
+
+.detail-left-column,
+.customer-contact-column,
+.detail-gallery-slider,
+.slider-main-photo,
+.slider-thumbnails-row {
+  min-width: 0;
+  max-width: 100%;
+}
+
+@media (max-width: 992px) {
+  .detail-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (max-width: 640px) {
+  .customer-page {
+    overflow-x: hidden;
+  }
+
+  .customer-page .container {
+    padding-left: 14px;
+    padding-right: 14px;
+    box-sizing: border-box;
+  }
+
+  .slider-main-photo {
+    height: auto;
+    aspect-ratio: 4 / 3;
+    border-radius: 16px;
+  }
+
+  .hero-selected-badge {
+    top: 12px;
+    left: 12px;
+    font-size: 10px;
+    padding: 5px 10px;
+  }
+
+  .slider-top-controls {
+    top: 12px;
+    right: 12px;
+    gap: 6px;
+  }
+
+  .slider-zoom-trigger {
+    display: none; /* tap the photo to zoom instead */
+  }
+
+  .slider-arrow {
+    width: 36px;
+    height: 36px;
+    font-size: 14px;
+  }
+
+  .slider-arrow-left { left: 10px; }
+  .slider-arrow-right { right: 10px; }
+
+  .slider-thumbnails-row {
+    gap: 8px;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+  }
+
+  .slider-thumbnails-row::-webkit-scrollbar {
+    display: none;
+  }
+
+  .thumbnail-item {
+    width: calc((100% - 32px) / 5);
+    height: auto;
+    aspect-ratio: 4 / 3;
+    border-radius: 8px;
+    scroll-snap-align: start;
+  }
+
+  .car-header-card {
+    flex-direction: column;
+    align-items: stretch;
+    padding: 18px;
+    gap: 10px;
+  }
+
+  .car-header-right {
+    text-align: left;
+  }
+
+  .car-main-title { font-size: 22px; }
+  .car-main-price { font-size: 26px; }
+
+  .car-desc-card,
+  .car-features-card,
+  .doc-card,
+  .coupon-card {
+    padding: 16px 18px;
+  }
+
+  .trust-chips-row {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+
+  .trust-chip {
+    text-align: center;
+  }
+
+  .coupon-top-content {
+    flex-wrap: wrap;
+  }
+
+  .coupon-cta-btn,
+  .coupon-toggle-btn.close-btn {
+    width: 100%;
+  }
+}
+
+/* ==========================================================================
+   PDF + COUPON CARDS — same row, equal & compact
+   ========================================================================== */
+.bottom-cards-row {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  max-width: 640px;
+  align-items: stretch;
+}
+
+.bottom-cards-row .coupon-card.expanded {
+  grid-column: 1 / -1;
+}
+
+.bottom-cards-row .doc-card,
+.bottom-cards-row .coupon-card:not(.expanded) {
+  min-height: 150px;
+  justify-content: center;
+}
+
+.bottom-cards-row .coupon-card:not(.expanded) .coupon-top-content {
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+.bottom-cards-row .coupon-card:not(.expanded) .coupon-icon-box {
+  display: none;
+}
+
+.bottom-cards-row .coupon-card:not(.expanded) .coupon-title {
+  font-size: 17px;
+}
+
+.bottom-cards-row .coupon-card:not(.expanded) .coupon-cta-btn {
+  width: 100%;
+  padding: 9px 14px;
+  font-size: 13px;
+}
+
+.bottom-cards-row .doc-status-box {
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+@media (max-width: 768px) {
+  .bottom-cards-row {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+    max-width: none;
+  }
+
+  .bottom-cards-row .doc-card,
+  .bottom-cards-row .coupon-card:not(.expanded) {
+    padding: 14px;
+    min-height: 140px;
+    border-radius: 16px;
+  }
+
+  .bottom-cards-row .coupon-card:not(.expanded) .coupon-sublabel {
+    font-size: 11px;
+  }
+
+  .bottom-cards-row .coupon-card:not(.expanded) .coupon-title {
+    font-size: 15px;
+  }
+
+  .bottom-cards-row .coupon-card:not(.expanded) .coupon-desc {
+    font-size: 11.5px;
+  }
+}
