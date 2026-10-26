@@ -43,7 +43,7 @@ export function App() {
   const [adminTab, setAdminTab] = useState('overview');
   const [advertiserTab, setAdvertiserTab] = useState('overview');
 
-  const [includeAdmin, setIncludeAdmin] = useState(true);
+  const [includeAdmin, setIncludeAdmin] = useState(false);
   const [toastMsg, setToastMsg] = useState('');
   const [attribution, setAttribution] = useState('PLATFORM');
   const [loadingDb, setLoadingDb] = useState(true);
@@ -67,6 +67,28 @@ export function App() {
         if (loadedFeatures?.length) setCarFeatures(loadedFeatures);
 
         const params = new URLSearchParams(window.location.search);
+        const portal = params.get('portal');
+        const portalKey = params.get('key');
+        const expectedAdminKey = import.meta.env.VITE_ADMIN_PORTAL_KEY || 'ktk-cubrod-admin-2026';
+
+        // ตรวจสอบการเข้าสู่ระบบแอดมินผ่านเว็บ kaitong (KTK ERP)
+        if (portal === 'kaitong-admin' && portalKey === expectedAdminKey) {
+          sessionStorage.setItem('cubrod-admin-session', 'active');
+          window.history.replaceState({}, '', window.location.pathname);
+          setView('admin');
+          setToastMsg('เข้าสู่ระบบแอดมินผ่านเว็บไข่ทองคำ (KTK) สำเร็จ');
+          setTimeout(() => setToastMsg(''), 3200);
+          setLoadingDb(false);
+          return;
+        }
+
+        // คงสถานะแอดมินกรณีรีเฟรชหน้าเว็บระหว่างทำงาน (จนกว่าจะกดออกจากระบบ)
+        if (! params.get('car') && !params.get('ref') && sessionStorage.getItem('cubrod-admin-session') === 'active') {
+          setView('admin');
+          setLoadingDb(false);
+          return;
+        }
+
         const carId = params.get('car');
         const refCode = params.get('ref');
         const viewParam = params.get('view');
@@ -146,6 +168,7 @@ export function App() {
   };
 
   const handleBackToHome = () => {
+    sessionStorage.removeItem('cubrod-admin-session');
     window.history.replaceState({}, '', window.location.pathname);
     setView('home');
   };
@@ -210,7 +233,7 @@ export function App() {
           onRegister={() => setView('register')}
           onAdvertiserRegister={() => setView('advertiser-register')}
           onLogin={() => {
-            setIncludeAdmin(true);
+            setIncludeAdmin(false);
             setView('login');
           }}
           onMobileLogin={() => {
