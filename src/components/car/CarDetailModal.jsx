@@ -235,8 +235,8 @@ export function CarDetailModal({ car, agents, attribution, onBack, onLead }) {
   return (
     <div className="customer-page">
       <div className="container">
-        <button className="back-link" onClick={onBack}>
-          ← กลับหน้าค้นหารถ
+        <button type="button" className="detail-back-btn" onClick={onBack}>
+          <span className="arrow">←</span> กลับหน้าหลัก
         </button>
 
         <div className="detail-grid">
@@ -533,12 +533,12 @@ export function CarDetailModal({ car, agents, attribution, onBack, onLead }) {
 
               {activeTab === 'chat' && (
                 <div className="chat-tab-content">
-                  <span className="lead-eyebrow">⚡ สอบถามรถคันนี้ (ไม่ต้องล็อกอิน)</span>
+                  <span className="lead-eyebrow">⚡ (แชทสดกับทีมงาน)</span>
                   <h2 className="lead-title">
                     แชทกับทีม <strong>CUBROD</strong>
                   </h2>
                   <p className="lead-sub">
-                    แนบข้อมูล <strong>{car.title}</strong> อัตโนมัติ สามารถกลับมาเปิดดูคำตอบจากแอดมินได้ตลอดเวลา
+                    แชทสด <strong>{car.title}</strong>สามารถกลับมาเปิดดูคำตอบจากแอดมินได้ตลอดเวลา
                   </p>
 
                   {/* DISPLAY CHAT HISTORY IF CUSTOMER ALREADY HAS MESSAGES */}
@@ -800,10 +800,6 @@ export function CarDetailModal({ car, agents, attribution, onBack, onLead }) {
 
             {/* Direct Contact Options */}
             <div className="direct-contact-card">
-              <div className="direct-contact-header">
-                <strong>สอบถามโดยตรงกับผู้ดูแล</strong>
-                <small>ประสานงานและตอบคำถามอย่างรวดเร็ว</small>
-              </div>
               <div className="direct-contact-actions">
                 <a href="tel:0823456789" className="phone-contact">
                   <span className="icon-circle">📞</span>
