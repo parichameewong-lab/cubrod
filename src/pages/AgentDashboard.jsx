@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import AppShell from '../layouts/AppShell';
 import StatCard from '../components/common/StatCard';
 import AgentCarList from '../components/car/AgentCarList';
@@ -7,6 +7,7 @@ import { formatNumber } from '../utils/formatters';
 
 export function AgentDashboard({
   agent,
+  onUpdate,
   cars,
   leads,
   tab,
@@ -17,6 +18,55 @@ export function AgentDashboard({
   showToast,
 }) {
   const [showCreateLink, setShowCreateLink] = useState(false);
+  const [savingProfile, setSavingProfile] = useState(false);
+  const [profileForm, setProfileForm] = useState({
+    name: agent.name || '',
+    phone: agent.phone || '',
+    line: agent.line || '',
+    province: agent.province || '',
+    payoutType: agent.payoutType || 'promptpay',
+    payoutAccount: agent.payoutAccount || '',
+  });
+
+  useEffect(() => {
+    setProfileForm({
+      name: agent.name || '',
+      phone: agent.phone || '',
+      line: agent.line || '',
+      province: agent.province || '',
+      payoutType: agent.payoutType || 'promptpay',
+      payoutAccount: agent.payoutAccount || '',
+    });
+  }, [agent]);
+
+  const handleSaveProfile = async () => {
+    const cleanName = profileForm.name.trim();
+    const cleanPhone = profileForm.phone.trim();
+
+    if (!cleanName || !cleanPhone) {
+      showToast('กรุณากรอกชื่อ-นามสกุล และเบอร์โทรศัพท์');
+      return;
+    }
+
+    setSavingProfile(true);
+    try {
+      const updatedAgent = {
+        ...agent,
+        name: cleanName,
+        phone: cleanPhone,
+        line: profileForm.line.trim(),
+        province: profileForm.province.trim(),
+        payoutType: profileForm.payoutType,
+        payoutAccount: profileForm.payoutAccount.trim(),
+      };
+      if (onUpdate) {
+        await onUpdate(updatedAgent);
+      }
+      showToast('บันทึกข้อมูลส่วนตัวและการรับเงินเรียบร้อยแล้ว');
+    } finally {
+      setSavingProfile(false);
+    }
+  };
 
   const tabs = [
     { id: 'overview', label: 'ภาพรวม', icon: '⌂' },
@@ -43,8 +93,8 @@ export function AgentDashboard({
     return phone;
   };
 
-  // 1. PENDING STATE (เมื่อบัญชีรอแอดมินอนุมัติ)
-  if (agent.status === 'pending') {
+  // 1. PENDING STATE (เมื่อบัญชีรอแอดมินอนุมัติ แต่ยังสามารถกดแท็บโปรไฟล์เพื่อแก้ไขข้อมูลส่วนตัวได้)
+  if (agent.status === 'pending' && tab !== 'profile') {
     return (
       <AppShell
         role="บัญชีรออนุมัติ"
@@ -76,15 +126,23 @@ export function AgentDashboard({
               <b className="badge warning">รออนุมัติ</b>
             </div>
           </div>
+          <button
+            type="button"
+            className="button"
+            style={{ marginTop: '20px' }}
+            onClick={() => setTab('profile')}
+          >
+            แก้ไขข้อมูลส่วนตัว
+          </button>
         </div>
       </AppShell>
     );
   }
 
-  // 2. APPROVED STATE (เมื่ออนุมัติแล้ว)
+  // 2. APPROVED STATE (หรือหน้าแก้ไขโปรไฟล์)
   return (
     <AppShell
-      role="นายหน้า"
+      role={agent.status === 'pending' ? 'บัญชีรออนุมัติ' : 'นายหน้า'}
       name={agent.name}
       tabs={tabs}
       activeTab={tab}
@@ -346,49 +404,103 @@ export function AgentDashboard({
           <>
             <div className="page-title">
               <h1>โปรไฟล์และการรับเงิน</h1>
-              <p>คุณสามารถเพิ่มข้อมูลที่จำเป็นภายหลังได้</p>
+              <p>คุณสามารถแก้ไขข้อมูลส่วนตัวและช่องทางรับค่าคอมมิชชันได้ตลอดเวลา</p>
             </div>
             <section className="panel profile-panel">
               <div className="profile-head">
-                <div className="large-avatar">{agent.name ? agent.name[0] : 'A'}</div>
+                <div className="large-avatar">
+                  {profileForm.name ? profileForm.name[0] : agent.name ? agent.name[0] : 'A'}
+                </div>
                 <div>
-                  <h2>{agent.name}</h2>
+                  <h2>{profileForm.name || agent.name}</h2>
                   <p>
-                    {agent.code} · <b className="badge success">อนุมัติแล้ว</b>
+                    {agent.code} ·{' '}
+                    <b className={agent.status === 'approved' ? 'badge success' : 'badge warning'}>
+                      {agent.status === 'approved' ? 'อนุมัติแล้ว' : 'รออนุมัติ'}
+                    </b>
                   </p>
                 </div>
               </div>
               <div className="profile-fields">
                 <label>
+                  <span>ชื่อ-นามสกุล</span>
+                  <input
+                    value={profileForm.name}
+                    onChange={(e) =>
+                      setProfileForm((prev) => ({ ...prev, name: e.target.value }))
+                    }
+                    placeholder="กรอกชื่อ-นามสกุล"
+                  />
+                </label>
+                <label>
                   <span>เบอร์โทร</span>
-                  <input value={agent.phone || ''} readOnly />
+                  <input
+                    type="tel"
+                    value={profileForm.phone}
+                    onChange={(e) =>
+                      setProfileForm((prev) => ({ ...prev, phone: e.target.value }))
+                    }
+                    placeholder="08X-XXX-XXXX"
+                  />
                 </label>
                 <label>
                   <span>LINE ID</span>
-                  <input value={agent.line || ''} readOnly />
+                  <input
+                    value={profileForm.line}
+                    onChange={(e) =>
+                      setProfileForm((prev) => ({ ...prev, line: e.target.value }))
+                    }
+                    placeholder="กรอก LINE ID สำหรับติดต่อ"
+                  />
                 </label>
                 <label>
                   <span>จังหวัด</span>
-                  <input value={agent.province || ''} readOnly />
+                  <input
+                    value={profileForm.province}
+                    onChange={(e) =>
+                      setProfileForm((prev) => ({ ...prev, province: e.target.value }))
+                    }
+                    placeholder="เช่น เชียงใหม่, กรุงเทพมหานคร"
+                  />
                 </label>
                 <label>
                   <span>ช่องทางรับเงิน</span>
-                  <select defaultValue="promptpay">
+                  <select
+                    value={profileForm.payoutType}
+                    onChange={(e) =>
+                      setProfileForm((prev) => ({ ...prev, payoutType: e.target.value }))
+                    }
+                  >
                     <option value="promptpay">PromptPay</option>
                     <option value="bank">บัญชีธนาคาร</option>
                   </select>
                 </label>
-                <label className="full-field">
-                  <span>หมายเลข PromptPay</span>
-                  <input placeholder="กรอกก่อนขอรับค่าคอมมิชชัน" />
+                <label>
+                  <span>
+                    {profileForm.payoutType === 'bank'
+                      ? 'ชื่อธนาคารและเลขที่บัญชี'
+                      : 'หมายเลข PromptPay'}
+                  </span>
+                  <input
+                    value={profileForm.payoutAccount}
+                    onChange={(e) =>
+                      setProfileForm((prev) => ({ ...prev, payoutAccount: e.target.value }))
+                    }
+                    placeholder={
+                      profileForm.payoutType === 'bank'
+                        ? 'เช่น กสิกรไทย 123-4-56789-0'
+                        : 'กรอกเบอร์โทรหรือเลขบัตรประชาชนผูก PromptPay'
+                    }
+                  />
                 </label>
               </div>
               <button
                 type="button"
                 className="button"
-                onClick={() => showToast('บันทึกข้อมูลรับเงินแล้ว')}
+                disabled={savingProfile}
+                onClick={handleSaveProfile}
               >
-                บันทึกข้อมูล
+                {savingProfile ? 'กำลังบันทึก...' : 'บันทึกข้อมูล'}
               </button>
             </section>
           </>

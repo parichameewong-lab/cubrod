@@ -62,7 +62,7 @@ export function AdvertiserRegisterForm({ onBack, onComplete, onNavigateToLogin }
       onBack={onBack}
     >
       <div className="auth-form-badge dealer-badge">
-        <span className="badge-icon">🏪</span>
+        <span className="badge-icon"></span>
         <span>สำหรับเต็นท์รถและผู้ประกอบการรถยนต์มือสอง</span>
       </div>
 
@@ -78,7 +78,7 @@ export function AdvertiserRegisterForm({ onBack, onComplete, onNavigateToLogin }
           <div className="form-group">
             <label htmlFor="adv-store">ชื่อเต็นท์รถ / ร้านค้า <span className="req">*</span></label>
             <div className="input-icon-wrapper">
-              <span className="field-icon">🏪</span>
+              <span className="field-icon"></span>
               <input
                 id="adv-store"
                 type="text"
@@ -93,7 +93,7 @@ export function AdvertiserRegisterForm({ onBack, onComplete, onNavigateToLogin }
           <div className="form-group">
             <label htmlFor="adv-owner">ชื่อผู้ติดต่อ</label>
             <div className="input-icon-wrapper">
-              <span className="field-icon">👤</span>
+              <span className="field-icon"></span>
               <input
                 id="adv-owner"
                 type="text"
@@ -109,7 +109,7 @@ export function AdvertiserRegisterForm({ onBack, onComplete, onNavigateToLogin }
           <div className="form-group">
             <label htmlFor="adv-email">อีเมลสำหรับเข้าสู่ระบบ <span className="req">*</span></label>
             <div className="input-icon-wrapper">
-              <span className="field-icon">✉️</span>
+              <span className="field-icon"></span>
               <input
                 id="adv-email"
                 type="email"
@@ -124,7 +124,7 @@ export function AdvertiserRegisterForm({ onBack, onComplete, onNavigateToLogin }
           <div className="form-group">
             <label htmlFor="adv-phone">เบอร์โทรศัพท์ติดต่อ <span className="req">*</span></label>
             <div className="input-icon-wrapper">
-              <span className="field-icon">📱</span>
+              <span className="field-icon"></span>
               <input
                 id="adv-phone"
                 type="tel"
@@ -141,7 +141,7 @@ export function AdvertiserRegisterForm({ onBack, onComplete, onNavigateToLogin }
           <div className="form-group">
             <label htmlFor="adv-province">จังหวัด</label>
             <div className="input-icon-wrapper">
-              <span className="field-icon">📍</span>
+              <span className="field-icon"></span>
               <input
                 id="adv-province"
                 type="text"
@@ -155,7 +155,7 @@ export function AdvertiserRegisterForm({ onBack, onComplete, onNavigateToLogin }
           <div className="form-group">
             <label htmlFor="adv-line">LINE ID <span className="opt">(ถ้ามี)</span></label>
             <div className="input-icon-wrapper">
-              <span className="field-icon">💬</span>
+              <span className="field-icon"></span>
               <input
                 id="adv-line"
                 type="text"
@@ -170,7 +170,7 @@ export function AdvertiserRegisterForm({ onBack, onComplete, onNavigateToLogin }
         <div className="form-group">
           <label htmlFor="adv-address">ที่อยู่เต็นท์รถ / สถานที่ตั้ง</label>
           <div className="input-icon-wrapper">
-            <span className="field-icon">🏢</span>
+            <span className="field-icon"></span>
             <input
               id="adv-address"
               type="text"
@@ -184,7 +184,7 @@ export function AdvertiserRegisterForm({ onBack, onComplete, onNavigateToLogin }
         <div className="form-group">
           <label htmlFor="adv-password">รหัสผ่าน <span className="req">*</span></label>
           <div className="input-icon-wrapper">
-            <span className="field-icon">🔑</span>
+            <span className="field-icon"></span>
             <input
               id="adv-password"
               type={showPassword ? 'text' : 'password'}

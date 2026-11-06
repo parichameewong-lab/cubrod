@@ -74,13 +74,13 @@ export function AgentRegisterForm({ onBack, onComplete, onNavigateToLogin }) {
         <div className="form-group">
           <label htmlFor="reg-name">ชื่อ-นามสกุล <span className="req">*</span></label>
           <div className="input-icon-wrapper">
-            <span className="field-icon">👤</span>
+            <span className="field-icon"></span>
             <input
               id="reg-name"
               type="text"
               name="name"
               required
-              placeholder="เช่น ธนา โชคดี"
+              placeholder="เช่น โชคดี เก่งเสมอ"
               className="clean-input"
             />
           </div>
@@ -89,7 +89,7 @@ export function AgentRegisterForm({ onBack, onComplete, onNavigateToLogin }) {
         <div className="form-group">
           <label htmlFor="reg-email">อีเมลสำหรับเข้าสู่ระบบ <span className="req">*</span></label>
           <div className="input-icon-wrapper">
-            <span className="field-icon">✉️</span>
+            <span className="field-icon"></span>
             <input
               id="reg-email"
               type="email"
@@ -105,7 +105,7 @@ export function AgentRegisterForm({ onBack, onComplete, onNavigateToLogin }) {
           <div className="form-group">
             <label htmlFor="reg-phone">เบอร์โทรศัพท์ <span className="req">*</span></label>
             <div className="input-icon-wrapper">
-              <span className="field-icon">📱</span>
+              <span className="field-icon"></span>
               <input
                 id="reg-phone"
                 type="tel"
@@ -120,7 +120,7 @@ export function AgentRegisterForm({ onBack, onComplete, onNavigateToLogin }) {
           <div className="form-group">
             <label htmlFor="reg-line">LINE ID <span className="opt">(ถ้ามี)</span></label>
             <div className="input-icon-wrapper">
-              <span className="field-icon">💬</span>
+              <span className="field-icon"></span>
               <input
                 id="reg-line"
                 type="text"
@@ -136,12 +136,12 @@ export function AgentRegisterForm({ onBack, onComplete, onNavigateToLogin }) {
           <div className="form-group">
             <label htmlFor="reg-province">จังหวัด</label>
             <div className="input-icon-wrapper">
-              <span className="field-icon">📍</span>
+              <span className="field-icon"></span>
               <input
                 id="reg-province"
                 type="text"
                 name="province"
-                placeholder="เช่น กรุงเทพมหานคร"
+                placeholder="เช่น เชียงใหม่"
                 className="clean-input"
               />
             </div>
@@ -150,7 +150,7 @@ export function AgentRegisterForm({ onBack, onComplete, onNavigateToLogin }) {
           <div className="form-group">
             <label htmlFor="reg-password">รหัสผ่าน <span className="req">*</span></label>
             <div className="input-icon-wrapper">
-              <span className="field-icon">🔑</span>
+              <span className="field-icon"></span>
               <input
                 id="reg-password"
                 type={showPassword ? 'text' : 'password'}

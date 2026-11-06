@@ -388,7 +388,7 @@ export function CarDetailModal({ car, agents, attribution, onBack, onLead }) {
 
             <div className="bottom-cards-row">
               <div className="doc-card">
-                <span className="doc-card-sublabel">เอกสารประกอบรถคันนี้</span>
+                <span className="doc-card-sublabel">รายงานตรวจสภาพ</span>
                 <div className="doc-status-box">
                   <span className="pdf-tag">PDF</span>
                   {car.inspectionReportUrl ? (
@@ -405,7 +405,7 @@ export function CarDetailModal({ car, agents, attribution, onBack, onLead }) {
                 <div className="coupon-top-content">
                   <div className="coupon-icon-box">✓</div>
                   <div className="coupon-text-group">
-                    <span className="coupon-sublabel">สิทธิพิเศษสำหรับผู้ซื้อรถคันนี้</span>
+                    <span className="coupon-sublabel">โปรโมชั่น</span>
                     <h3 className="coupon-title">คูปองตรวจสภาพรถฟรี</h3>
                     <p className="coupon-desc">
                       มูลค่า <strong className="orange-text">1,500 บาท</strong> · เมื่อซื้อรถสำเร็จ รับเงินสดตามมูลค่าคูปอง
@@ -787,15 +787,9 @@ export function CarDetailModal({ car, agents, attribution, onBack, onLead }) {
                 </div>
               )}
 
-              {agentObj ? (
-                <div className="lead-footer-attribution">
-                  <span className="shield-icon">🛡️</span> ลิงก์แนะนำโดย <strong>{agentObj.name}</strong> · คุ้มครองสิทธิ์ 30 วัน
-                </div>
-              ) : (
-                <div className="lead-footer-attribution">
-                  <span className="shield-icon">🛡️</span> คุ้มครองสิทธิ์และบริการโดย <strong>CUBROD Official</strong>
-                </div>
-              )}
+              <div className="lead-footer-attribution">
+                <span className="shield-icon">🛡️</span> คุ้มครองสิทธิ์และบริการโดย <strong>CUBROD Official</strong>
+              </div>
             </div>
 
             {/* Direct Contact Options */}

@@ -334,6 +334,8 @@ export const dbUpdateLead = async (leadId, fields) => {
       if ('leadStatus' in fields) dbFields.lead_status = fields.leadStatus;
       if ('saleStatus' in fields) dbFields.sale_status = fields.saleStatus;
       if ('payoutStatus' in fields) dbFields.payout_status = fields.payoutStatus;
+      if ('commissionAmount' in fields) dbFields.commission_amount = Number(fields.commissionAmount || 0);
+      if ('agentCode' in fields) dbFields.agent_code = fields.agentCode;
       if ('notes' in fields) dbFields.notes = fields.notes;
       dbFields.updated_at = new Date().toISOString();
 

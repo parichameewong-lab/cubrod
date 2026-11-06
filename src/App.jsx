@@ -294,6 +294,14 @@ export function App() {
       {view === 'agent' && currentAgent && (
         <AgentDashboard
           agent={currentAgent}
+          onUpdate={async (updated) => {
+            setAgents((prev) => prev.map((a) => (a.id === updated.id ? updated : a)));
+            setCurrentAgent(updated);
+            if (activeStorefrontAgent?.id === updated.id) {
+              setActiveStorefrontAgent(updated);
+            }
+            await dbUpsertAgent(updated);
+          }}
           cars={cars}
           leads={leads}
           tab={agentTab}

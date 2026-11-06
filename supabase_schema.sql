@@ -60,7 +60,7 @@ CREATE TABLE IF NOT EXISTS public.clubrod_cars (
     color TEXT,
     license_plate TEXT,
     province TEXT,
-    status TEXT NOT NULL DEFAULT 'active' CHECK (status IN ('active', 'paused', 'sold')),
+    status TEXT NOT NULL DEFAULT 'active' CHECK (status IN ('active', 'paused', 'sold', 'hidden')),
     is_clubrod_choice BOOLEAN DEFAULT FALSE,
     commission_total NUMERIC DEFAULT 0,
     commission_agent NUMERIC DEFAULT 0,
@@ -172,3 +172,26 @@ VALUES
   ('สปอยเลอร์หลังพร้อมไฟเบรกดวงที่ 3', 'appearance', '🚘'),
   ('ชุดแต่งสเกิร์ตรอบคัน', 'appearance', '✨')
 ON CONFLICT (name) DO NOTHING;
+
+-- ==============================================================================
+-- FOREIGN KEY INDEXES & SUPABASE STORAGE BUCKET ('clubrod-media')
+-- ==============================================================================
+CREATE INDEX IF NOT EXISTS idx_clubrod_cars_advertiser_id ON public.clubrod_cars(advertiser_id);
+CREATE INDEX IF NOT EXISTS idx_clubrod_leads_car_id ON public.clubrod_leads(car_id);
+
+INSERT INTO storage.buckets (id, name, public)
+VALUES ('clubrod-media', 'clubrod-media', true)
+ON CONFLICT (id) DO UPDATE SET public = true;
+
+DROP POLICY IF EXISTS "Allow public read clubrod-media" ON storage.objects;
+CREATE POLICY "Allow public read clubrod-media" ON storage.objects
+  FOR SELECT USING (bucket_id = 'clubrod-media');
+
+DROP POLICY IF EXISTS "Allow public insert clubrod-media" ON storage.objects;
+CREATE POLICY "Allow public insert clubrod-media" ON storage.objects
+  FOR INSERT WITH CHECK (bucket_id = 'clubrod-media');
+
+DROP POLICY IF EXISTS "Allow public update clubrod-media" ON storage.objects;
+CREATE POLICY "Allow public update clubrod-media" ON storage.objects
+  FOR UPDATE USING (bucket_id = 'clubrod-media') WITH CHECK (bucket_id = 'clubrod-media');
+
